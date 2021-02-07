@@ -1,0 +1,19 @@
+{{extend 'layout.html'}}
+{{include 'dash/LayoutGraficos.html'}}
+{{include 'dash/LayoutDatatables.html'}}
+
+<strong>{{=T('CONTROL TEST REPORT')}}</strong>
+<br>
+<br>
+<div class="row">
+  <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+    {{include 'dash/BarPruebaCtrlCmpl.html'}}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+    {{include 'dash/BarPruebaCtrlMat.html'}}
+  </div>
+</div>
+

@@ -1,0 +1,46 @@
+{{extend 'layout.html'}}
+{{include 'dash/LayoutGraficos.html'}}
+{{include 'dash/LayoutDatatables.html'}}
+
+<div class="row">
+  <div class="col-md-4 col-lg-4 col-sm-12 col-xs-12">
+    <strong>{{=T('Risk Analysis')}} </strong> &nbsp; &nbsp; &nbsp; <a href="{{=URL('default','DashAnalisisRiesgo')}}"><i class="fa fa-expand" aria-hidden="true"></i>  <span style="font-size: 9px">{{=T('View Details')}}</span></a><br><br>
+    {{include 'dash/GraficoPastelRiesgo.html'}}
+  </div>
+  <div class="col-md-8 col-lg-8 col-sm-12 col-xs-12">
+    {{include 'dash/MatrizRiesgo.html'}}
+  </div>
+</diV>
+
+<div class="row">
+  <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+    {{include 'dash/BarPruebaCtrlCmpl.html'}}
+  <div>
+</div>
+
+<div class="row">
+  <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+    {{include 'dash/BarPruebaCtrlMat.html'}}
+  <div>
+</div>
+
+<script>
+  function openCity(evt, cityName) {
+  // Declare all variables
+  var i, tabcontent, tablinks;
+  // Get all elements with class="tabcontent" and hide them
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  // Get all elements with class="tablinks" and remove the class "active"
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+  // Show the current tab, and add an "active" class to the button that opened the tab
+  document.getElementById(cityName).style.display = "block";
+  evt.currentTarget.className += " active";
+  }
+</script>
+

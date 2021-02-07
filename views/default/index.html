@@ -1,0 +1,92 @@
+{{extend 'layout.html'}}
+{{include 'dash/LayoutGraficos.html'}}
+{{include 'dash/LayoutDatatables.html'}}
+
+<strong>{{=T('ALL REPORT')}}</strong>
+<br>
+<br>
+
+<div class="row row-centered" style="width:90%;">
+  <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+    <strong>{{=T('Risk Factor Heat Map')}}</strong>
+    {{include 'dash/GraficoCalorRiesgo.html'}}
+  </div>
+</div>
+
+<div class="row row-centered" style="width:90%;">
+  <div class="col-md-4 col-lg-4 col-sm-4 col-xs-4">
+    <strong>{{=T('Risk Level')}}</strong>
+    {{include 'dash/GraficoPastelNivelRiesgo.html'}}
+  </div>
+  <div class="col-md-8 col-lg-8 col-sm-8 col-xs-8">
+    {{include 'dash/MatrizNivelRiesgo.html'}}
+  </div>
+</div>
+
+<div class="row row-centered" style="width:90%;">
+  <div class="col-md-4 col-lg-4 col-sm-4 col-xs-4">
+    <strong>{{=T('Risk Category')}}</strong>
+    {{include 'dash/GraficoPastelCategoriaRiesgo.html'}}
+  </div>
+  <div class="col-md-8 col-lg-8 col-sm-8 col-xs-8">
+    {{include 'dash/MatrizCategoriaRiesgo.html'}}
+   </div>
+</div>
+
+<div class="row row-centered" style="width:90%;">
+  <div class="col-md-4 col-lg-4 col-sm-4 col-xs-4">
+    <strong>{{=T('Process Risk')}}</strong>
+    {{include 'dash/GraficoPastelProceso.html'}}
+  </div>
+  <div class="col-md-4 col-lg-4 col-sm-4 col-xs-4">
+    <strong>{{=T('IT System Risk')}}</strong>
+    {{include 'dash/GraficoPastelActivoTi.html'}}
+  </div>
+  <div class="col-md-4 col-lg-4 col-sm-4 col-xs-4">
+    <strong>{{=T('Type Risk Factor')}}</strong>
+    {{include 'dash/GraficoPastelTipoFactor.html'}}
+  </div>
+</div>
+
+<div class="row row-centered" style="width:90%;">
+  <div class="col-md-4 col-lg-4 col-sm-4 col-xs-4">
+    <strong>{{=T('Risk Factor Treatment')}}</strong>
+    {{include 'dash/GraficoPastelTratamiento.html'}}
+  </div>
+  <div class="col-md-4 col-lg-4 col-sm-4 col-xs-4">
+    <strong>{{=T('Control Type')}}</strong>
+    {{include 'dash/FactorRiesgoTipoControl.html'}}
+  </div>
+  <div class="col-md-4 col-lg-4 col-sm-4 col-xs-4">
+    <strong>{{=T('Control')}}</strong>
+    {{include 'dash/FactorRiesgoCataControl.html'}}
+  </div>
+</div>
+
+
+<div class="row row-centered" style="width:90%;">
+  <div class="col-md-4 col-lg-4 col-sm-4 col-xs-4">
+    <strong>{{=T('Control Clasification')}}</strong>
+    {{include 'dash/FactorRiesgoClasControl.html'}}
+  </div>
+  <div class="col-md-4 col-lg-4 col-sm-4 col-xs-4">
+    <strong>{{=T('Control Status')}}</strong>
+    {{include 'dash/FactorRiesgoStatusControl.html'}}
+  </div>
+  <div class="col-md-4 col-lg-4 col-sm-4 col-xs-4">
+    <strong>{{=T('Fraud Risk')}}</strong>
+    {{include 'dash/FactorRiesgoFraude.html'}}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+    {{include 'dash/BarPruebaCtrlCmpl.html'}}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+    {{include 'dash/BarPruebaCtrlMat.html'}}
+  </div>
+</div>

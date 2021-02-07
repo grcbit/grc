@@ -1,0 +1,20 @@
+{{extend 'layout.html'}}
+{{include 'dash/LayoutGraficos.html'}}
+{{include 'dash/LayoutDatatables.html'}}
+
+<strong>{{=T('HEAT MAP REPORT')}}</strong>
+<br>
+<br>
+<div class="row row-centered" style="width:90%;">
+  <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+    <strong>{{=T('Risk Factor Heat Map')}}</strong>
+    {{include 'dash/GraficoCalorRiesgo.html'}}
+  </div>
+</div>
+
+<div class="row row-centered" style="width:100%;">
+  <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+    <strong>{{=T('Risk Factor Matrix')}}</strong>
+    {{include 'dash/MatrizFactorRiesgo.html'}}
+  </div>
+</div>

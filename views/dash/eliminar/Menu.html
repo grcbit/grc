@@ -1,0 +1,96 @@
+<style>
+  .sidenav {height: 70%;width: 0;position: fixed;z-index: 1;top: 5;left: 0;background-color: {{=backGroundColor}};overflow-x: hidden;transition: 0.5s;padding-top: 50px;}
+  .sidenav a {padding: 8px 8px 8px 32px;text-decoration: none;font-size: 15px;color: {{=fontColor}};display: block;transition: 0.3s;}
+  .sidenav a:hover, .offcanvas a:focus{color: {{=fontColor}};background-color:{{=backGroundColorHover}};}
+  .sidenav .closebtn {position: absolute;top: 0;right: 25px;font-size: 36px; margin-left: 50px;}
+  #main {transition: margin-left .5s;padding: 0px;}
+  @media screen and (max-height: 450px) {.sidenav {padding-top: 15px;}.sidenav a {font-size: 18px;}}
+  .button {  left: 95%;  margin: 0;  position: absolute;  top: 50%;  transform: translate(-50%, -50%);  text-align: center;  }
+  .chart {  align-content: center;  display: flex;  justify-content: center;  }
+  .modal {  text-align: center;  }
+  @media screen and (min-width: 468px) {.modal:before {    content: " ";    display: inline-block;    height: 100%;    vertical-align: middle;    }}
+  .modal-dialog {  display: inline-block;  text-align: center;  vertical-align: middle;  }
+  .modal-footer {  color: #00b5e6;  font-size: 20px;  text-align: center;  }
+  #popupInherente { visibility: hidden; opacity: 0; margin-top: -300px; }
+  #popupInherente:target { visibility:visible; opacity: 1; background-color: rgba(0,0,0,0.8); position: fixed; top:0; left:0; right:0; bottom:0; margin:0; z-index: 999; transition:all 1s; }
+  .popup-contenedor { position: relative; margin:7% auto; padding:30px 50px; background-color: #fafafa; color:#333; border-radius: 3px; width:85%; }
+  a.popup-cerrar { position: absolute; top:3px; right:3px; background-color: #333; padding:7px 10px; font-size: 20px; text-decoration: none; line-height: 1; color:#fff; }
+</style>
+
+<div id="mySidenav" class="sidenav">
+  <strong> <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a> </strong>
+
+  <a href="{{=URL('default', 'index')}}"><font style="font-size:12px; color:{{=fontColor}}">{{=T('Refresh')}}</font></a>
+
+  <a data-toggle="collapse" href="#collapse1"><h6 >{{=T('Risk')}}</h6></a>
+    <div id="collapse1" class="panel-collapse collapse" >
+      <div id="content1" >
+        <ul class="list-group" style="font-size:10px; background-color:{{=backGroundColorHover}}; color:{{=fontColor}};"></ul>
+      </div>
+    </div>
+    {{for i in AnalisisRiesgo:}}
+        <script>
+            $('#content1 ul').append('<a href="{{=URL('default', request.function, vars=dict(Parametro, Riesgo=i.id))}}"><li style="font-size:10px; background-color:{{=backGroundColorHover}}; color:{{=fontColor}};" >{{=str(i.Riesgo)[0:200]}}</li></a>');
+        </script>
+    {{pass}}
+
+  <a data-toggle="collapse" href="#collapse2"><h6 >{{=T('Organizational Objective')}}</h6></a>
+    <div id="collapse2" class="panel-collapse collapse" >
+      <div id="content2" >
+        <ul class="list-group" style="font-size:10px; background-color:{{=backGroundColorHover}}; color:{{=fontColor}};"></ul>
+      </div>
+    </div>
+    {{for i in ObjetivoOrganizacion:}}
+        <script>
+            $('#content2 ul').append('<a href="{{=URL('default', request.function, vars=dict(Parametro, Objetivo=i.id ))}}"><li style="font-size:10px; background-color:{{=backGroundColorHover}}; color:{{=fontColor}};" >{{=i.Nombre}}</li></a>');
+        </script>
+    {{pass}}
+
+    <a data-toggle="collapse" href="#collapse3"><h6 >{{=T('Risk Classification')}}</h6></a>
+    <div id="collapse3" class="panel-collapse collapse" >
+      <div id="content3" >
+        <ul class="list-group" style="font-size:10px; background-color:{{=backGroundColorHover}}; color:{{=fontColor}};"></ul>
+      </div>
+    </div>
+    {{for i in ClasificacionRiesgo:}}
+        <script>
+            $('#content3 ul').append('<a href="{{=URL('default', request.function, vars=dict(Parametro, Tipo=i.id ))}}"><li style="font-size:10px; background-color:{{=backGroundColorHover}}; color:{{=fontColor}};" >{{=i.Nombre}}</li></a>');
+        </script>
+    {{pass}}
+
+    <a data-toggle="collapse" href="#collapse4"><h6 >{{=T('Risk Factor')}}</h6></a>
+    <div id="collapse4" class="panel-collapse collapse" >
+      <div id="content4" >
+        <ul class="list-group" style="font-size:10px; background-color:{{=backGroundColorHover}}; color:{{=fontColor}};"></ul>
+      </div>
+    </div>
+    {{for i in TipoFactorRiesgo:}}
+        <script>
+            $('#content4 ul').append('<a href="{{=URL('default', request.function, vars=dict(Parametro, Factor=i.id))}}"><li style="font-size:10px; background-color:{{=backGroundColorHover}}; color:{{=fontColor}};" >{{=i.Nombre}}</li></a>');
+        </script>
+    {{pass}}
+
+    <a data-toggle="collapse" href="#collapse5"><h6 >{{=T('Control')}}</h6></a>
+    <div id="collapse5" class="panel-collapse collapse" >
+      <div id="content5" >
+        <ul class="list-group" style="font-size:10px; background-color:{{=backGroundColorHover}}; color:{{=fontColor}};"></ul>
+      </div>
+    </div>
+
+    {{for i in CatalogoControl:}}
+        <script>
+            $('#content5 ul').append('<a href="{{=URL('default', request.function, vars=dict(Parametro, Control=i.id))}}"><li style="font-size:10px; background-color:{{=backGroundColorHover}}; color:{{=fontColor}};" >{{=i.Nombre}}</li></a>');
+        </script>
+    {{pass}}
+</div>
+
+<div id="main">
+    <span style="font-size:20px;cursor:pointer" onclick="openNav()">&#9776;</span>
+</div>
+
+<script>
+  function openNav() {document.getElementById("mySidenav").style.width = "250px";document.getElementById("main").style.marginLeft = "250px";}
+  function closeNav() {document.getElementById("mySidenav").style.width = "0";document.getElementById("main").style.marginLeft= "0";}
+</script>
+
+

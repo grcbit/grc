@@ -1,0 +1,105 @@
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Range HeatMap</title>
+
+    <style> #chart {max-width: 650px; margin: 35px auto;}</style>
+
+    <div id="app3"></div>
+
+    <script type="text/babel">
+      class ApexChart extends React.Component {
+        constructor(props) {
+          super(props);
+
+          this.state = {
+          
+            series: [
+	      {
+		name: '{{=T('Rare')}}',
+		data: [{x:'',y:[10,8,9,1]}, {x:'',y:8} ]
+              },
+              {
+                name: '{{=T('Unlikely')}}',
+              },
+              {
+                name: '{{=T('Possible')}}',
+              },
+              {
+                name: '{{=T('Likely')}}',
+              },
+              {
+                name: '{{=T('Likely')}}',
+              },
+            ],
+            options: {
+              chart: {
+                height: 350,
+                type: 'heatmap',
+              },
+              plotOptions: {
+                heatmap: {
+                  shadeIntensity: 0.5,
+                  radius: 0,
+                  useFillColorAsStroke: true,
+                  colorScale: {
+                    ranges: [{
+                        from: 0,
+                        to: 3.9,
+			name: '{{=T('Low')}}',
+                        color: '#00FF00'
+                      },
+                      {
+                        from: 4.0,
+                        to: 6.9,
+			name: '{{=T('Moderate')}}',
+                        color: '#FFFF00'
+                      },
+                      {
+                        from: 7.0,
+                        to: 10,
+			name: '{{=T('High')}}',
+                        color: '#FF0000'
+                      },
+                      //{
+                      //  from: 46,
+                      //  to: 55,
+		      //name: '{{=T('Critical')}}',
+                      //color: '#FF0000'
+                      //}
+                    ]
+                  }
+                }
+              },
+              dataLabels: {
+                enabled: false
+              },
+              stroke: {
+                width: 1
+              },
+              title: {
+                text: 'HeatMap Chart with Color Range'
+              },
+            },
+          
+          
+          };
+        }
+
+      
+
+        render() {
+          return (
+            <div>
+              <div id="chart">
+                <ReactApexChart options={this.state.options} series={this.state.series} type="heatmap" height={350} />
+              </div>
+              <div id="html-dist"></div>
+            </div>
+          );
+        }
+      }
+
+      const domContainer = document.querySelector('#app3');
+      ReactDOM.render(React.createElement(ApexChart), domContainer);
+    </script>
+
+    

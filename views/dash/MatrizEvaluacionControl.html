@@ -1,0 +1,46 @@
+<script>
+    $(document).ready(function() {$("#MatrizEvidenciaControl").removeAttr('width').dataTable( { lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]], scrollY: "500px", scrollX: true, scrollCollapse: true,  columnDefs: [{targets: ['politica', "benchmark", "control", "hallazgo", "recomendacion"], width:200 } ], fixedColumns: {leftColumns: 0}, dom: 'Bfrtip', buttons: ['copy', 'csv', 'excel', 'pdf', 'print']  } );} );
+</script>
+
+<h6>
+  <table id="MatrizEvidenciaControl" align="left" class="display" width="100%" cellspacing="0" style="font-size:11">
+    <thead>
+      <tr>
+	<td>{{=T('TEST TYPE')}}</td>
+	<td class="politica">{{=T('POLICY')}}</td>
+	<td class="benchmark">{{=T('BENCHMARK')}}</td>
+	<td class="control">{{=T('CONTROL ACTIVITY')}}</td>
+	<td>{{=T('PROCESS')}}</td>
+	<td>{{=T('IT SYSTEM')}}</td>
+	<td>{{=T('PASS/FAIL')}}</td>
+	<td>{{=T('MATURITY LEVEL')}}</td>
+	<td>{{=T('DATE')}}</td>
+	<td class="hallazgo">{{=T('FINDING')}}</td>
+	<td class="recomendacione">{{=T('RECOMMENDATION')}}</td>
+	<td>{{=T('EVIDENCE')}}</td>
+      </tr>
+    </thead>
+    <tbody>
+      {{for i in ArregloEvidenciaControl:}}
+        <tr>
+	  <td>{{=i[0]}}</td>
+	  <td>{{=i[1]}}</td>
+	  <td>{{=i[2]}}</td>
+	  <td>{{=i[3]}}</td>
+	  <td>{{=i[4]}}</td>
+	  <td>{{=i[5]}}</td>
+	  <td>{{=i[6]}}</td>
+	  <td>{{=i[7]}}</td>
+	  <td>{{=i[8]}}</td>
+	  <td>{{=i[9]}}</td>
+	  <td>{{=i[10]}}</td>
+	  <td>
+	    {{for x in i[11]:}}
+	      <a href="{{=x}}">File</a><br>
+	    {{pass}}
+	  </td>
+        </tr>
+      {{pass}}
+    </tbody>
+  </table>
+</h6>

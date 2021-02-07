@@ -1,0 +1,44 @@
+
+<script>
+  $(document).ready(function() {$("#MatrizRiesgoIndicador").removeAttr('width').dataTable( { lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]], scrollY: "300px", scrollX: true, scrollCollapse: true,  dom: 'Bfrtip', buttons: ['copy', 'csv', 'excel', 'pdf', 'print'] });} );
+</script>
+
+<h6>
+  <div class="row">
+    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+    <table id="MatrizRiesgoIndicador" align="left" class="display" width="90%" cellspacing="0" style="font-size:15" >
+      <thead>
+      <tr>
+        <td class="Riesgo">{{=T('RISK')}}</td>
+        <td>{{=T('IMPACT')}}</td>
+        <td>{{=T('CONSEQUENCE')}}</td>
+        <td>{{=T('OBJECTIVE')}}</td>
+      </tr>
+      </thead>
+    <tbody>
+    {{for i in ArregloMatrizRiesgo:}}
+      <tr>
+	<td>{{=i[0]}}</td>
+
+	{{if i[2]=="Bajo (Low)":}}
+          <td bgcolor="#00FF00">{{=i[2]}}</td>
+	{{elif i[2]=="Moderado (Moderate)":}}
+          <td bgcolor="#FFFF00">{{=i[2]}}</td>
+	{{elif i[2]=="Alto (High)":}}
+          <td bgcolor="#FFC300">{{=i[2]}}</td>
+	{{elif i[2]=="Critico (Critical)":}}
+          <td bgcolor="#FF0000">{{=i[2]}}</td>
+	{{pass}}
+
+	<td>{{=i[3]}}</td>
+	<td>{{=i[4]}}</td>
+      </tr>
+    {{pass}}
+    </tbody>
+  </table>
+  </div>
+</div>
+<br>
+
+</h6>
+

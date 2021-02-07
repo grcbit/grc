@@ -1,0 +1,90 @@
+<div class="row status">
+  <div class="col-md-3 col-lg-3 col-sm-12 col-xs-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div class="row">
+          <div class="col-md-3 col-lg-3 col-sm-12 col-xs-12">
+            <i class="fa fa-line-chart fa-5x" style="font-size:40px; color:red;"></i>
+          </div>
+          <div class="col-xs-9 text-right">
+            <strong><div style="font-size:20px;">{{=TotalRiesgoInherente}}</div></strong>
+            <strong><div>{{=T('Risk')}}</div></strong>
+          </div>
+        </div>
+      </div>
+      <a href="{{=URL('default','MatrizRiesgo', vars=request.vars)}}" target="_blank">
+        <div class="panel-footer">
+          <span class="pull-left">{{=T('View Details')}}</span>
+          <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+          <div class="clearfix"></div>
+        </div>
+      </a>
+    </div>
+  </div>
+  <div class="col-md-3 col-lg-3 col-sm-12 col-xs-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div class="row">
+          <div class="col-md-3 col-lg-3 col-sm-12 col-xs-12">
+            <i class="fa fa-exclamation-triangle fa-5x" style="font-size:40px; color:blue;"></i>
+          </div>
+          <div class="col-xs-9 text-right">
+            <strong><div style="font-size:20px;">{{=TotalTratamientoRiesgo}}</div></strong>
+	    <strong><div>{{=T('Risk Factor')}}</div></strong>
+          </div>
+        </div>
+      </div>
+      <a href="{{=URL('default','FactorRiesgo', vars=request.get_vars)}}" target="_blank">
+        <div class="panel-footer">
+          <span class="pull-left">{{=T('View Details')}}</span>
+          <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+          <div class="clearfix"></div>
+        </div>
+      </a>
+    </div>
+  </div>
+  <div class="col-md-3 col-lg-3 col-sm-12 col-xs-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div class="row">
+          <div class="col-md-3 col-lg-3 col-sm-12 col-xs-12">
+            <i class="fa fa-search fa-5x" style="font-size:40px; color:orange;"></i>
+          </div>
+          <div class="col-xs-9 text-right">
+	    <strong><div style="font-size:20px;">{{=TotalEvaluacionControl}}</div></strong>
+	    <strong><div>{{=T('Control Test')}}</div></strong>
+          </div>
+        </div>
+      </div>
+      <a href="{{=URL('default','indexEvaluacionControl', vars=request.get_vars)}}" target="_blank">
+        <div class="panel-footer">
+	  <span class="pull-left">{{=T('View Details')}}</span>
+          <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+          <div class="clearfix"></div>
+        </div>
+      </a>
+    </div>
+  </div>
+  <div class="col-md-3 col-lg-3 col-sm-12 col-xs-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div class="row">
+          <div class="col-md-3 col-lg-3 col-sm-12 col-xs-12">
+            <i class="fa fa-info-circle fa-5x" style="font-size:40px; color:purple;"></i>
+          </div>
+          <div class="col-xs-9 text-right">
+	    <strong><div style="font-size:20px;">{{=TotalIncidenteSeguridad}}</div></strong>
+	    <strong><div>{{=T('IT Security Incident')}}</div></strong>
+          </div>
+        </div>
+      </div>
+      <a href="{{=URL('default','indexIncidenteSeguridadTi', vars=request.get_vars)}}" target="_blank">
+        <div class="panel-footer">
+          <span class="pull-left">{{=T('View Details')}}</span>
+          <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+          <div class="clearfix"></div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
