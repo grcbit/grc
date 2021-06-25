@@ -3,10 +3,8 @@
 if not request.env.web2py_runtime_gae:
     try:
         db = DAL('sqlite://grcDemo200220.sqlite', db_codec='UTF-8')
-        #db = DAL('postgres://postgres:Password01@172.17.0.3/grc01', db_codec='UTF-8')
     except:
         db = DAL('sqlite://grcDemo200220.sqlite', db_codec='UTF-8', migrate=False, fake_migrate=False)
-        #db = DAL('postgres://postgres:Password01@172.17.0.3/grc01', db_codec='UTF-8', migrate=True)
 else:
     db = DAL('google:datastore')
     session.connect(request, response, db=db)
