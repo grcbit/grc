@@ -1,0 +1,26 @@
+{{extend 'layout.html'}}
+{{include 'dash/LayoutDatatables.html'}}
+{{include 'dash/LayoutGraficos.html'}}
+
+</div>
+
+  <div class="container">
+	  <strong>{{=T('Control Maturity Level & Compliance')}}</strong><br><br>
+
+    <div class="row">
+      <div class="col-md-6 col-lg-6 col-sm-12 col-xs-12">
+        {{include 'dash/GraficoPruebaControl.html'}}
+      </div>
+      <div class="col-md-6 col-lg-6 col-sm-12 col-xs-12">
+        {{include 'dash/GraficoCumplimientoControl.html'}}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+        {{include 'dash/MatrizEvaluacionControl.html'}}
+      </div>
+    </div>
+
+
+  </div>
+

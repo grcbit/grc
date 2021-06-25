@@ -1,0 +1,44 @@
+{{extend 'layout.html'}}
+
+<h2>{{=T( request.args(0).replace('_',' ').capitalize() )}}</h2>
+<div id="web2py_user_form">
+{{
+if request.args(0)=='login':
+    if not 'register' in auth.settings.actions_disabled:
+        form.add_button(T('Register'),URL(args='register', vars={'_next': request.vars._next} if request.vars._next else None),_class='btn')
+    pass
+    if not 'request_reset_password' in auth.settings.actions_disabled:
+        form.add_button(T('Lost Password'),URL(args='request_reset_password'),_class='btn')
+    pass
+pass
+=form
+}}
+</div>
+
+{{if test==1:}}
+<!--
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<a href="https://github.com/grcbit/" target="_blank"><i class="fa fa-github" aria-hidden="true" style='font-size:24px;color:black'></i></a>
+-->
+<h2>DEMO: admin / Password01</h2>
+<br><p>GRCbit es un software desarrollado en python/web2py que le ayudará a automatizar y centralizar la gestión de <strong>Riesgos TI</strong> en su organización (Governance, Risk and Compliance), para tener mayor control sobre sus operaciones, procesos y sistemas críticos.
+<br>Está basado en mejores prácticas de gestión de riesgos y control interno como COSO, ISO 31000, COBIT, NIST, CVSS3.1, por lo que cualquier empresa sin importar su tipo o tamaño puede utilizarlo, lo cual traerá beneficios como:</p>
+<ul>
+  <li>Cumplir con leyes y regulaciones</li>
+  <li>Reducir fraudes</li>
+  <li>Reducir de errores en la operación</li>
+  <li>Proteger datos críticos y sistemas de información</li>
+</ul>
+<p>Para obtener una copia del software contactar a: <a href="mailto:contacto@grcbit.com">contacto@grcbit.com</a></p>
+{{else:}}
+{{pass}}
+
+
+<script language="javascript"><!--
+jQuery("#web2py_user_form input:visible:enabled:first").focus();
+{{if request.args(0)=='register':}}
+    web2py_validate_entropy(jQuery('#auth_user_password'),100);
+{{elif request.args(0)=='change_password':}}
+    web2py_validate_entropy(jQuery('#no_table_new_password'),100);
+{{pass}}
+//--></script>

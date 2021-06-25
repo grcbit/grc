@@ -1,0 +1,232 @@
+<!-- Styles -->
+
+<style>
+  #chartdiv {
+    width: 100%;
+    height: 500px;
+  }
+</style>
+
+<!-- Chart code -->
+<script>
+  am4core.ready(function() {
+    // Themes begin
+    am4core.useTheme(am4themes_animated);
+    // Themes end
+    var chart = am4core.create("chartdiv", am4charts.XYChart);
+    chart.hiddenState.properties.opacity = 0; // this creates initial fade-in
+    chart.maskBullets = false;
+    var xAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+    var yAxis = chart.yAxes.push(new am4charts.CategoryAxis());
+    xAxis.dataFields.category = "x";
+    yAxis.dataFields.category = "y";
+    xAxis.renderer.grid.template.disabled = true;
+    xAxis.renderer.minGridDistance = 40;
+    yAxis.renderer.grid.template.disabled = true;
+    yAxis.renderer.inversed = true;
+    yAxis.renderer.minGridDistance = 30;
+    var series = chart.series.push(new am4charts.ColumnSeries());
+    series.dataFields.categoryX = "x";
+    series.dataFields.categoryY = "y";
+    series.dataFields.value = "value";
+    series.sequencedInterpolation = true;
+    series.defaultState.transitionDuration = 3000;
+    // Set up column appearance
+    var column = series.columns.template;
+    column.strokeWidth = 2;
+    column.strokeOpacity = 1;
+    column.stroke = am4core.color("#ffffff");
+    column.tooltipText = "{x}, {y}: {value.workingValue.formatNumber('#.')}";
+    column.width = am4core.percent(100);
+    column.height = am4core.percent(100);
+    column.column.cornerRadius(6, 6, 6, 6);
+    column.propertyFields.fill = "color";
+    // Set up bullet appearance
+    var bullet1 = series.bullets.push(new am4charts.CircleBullet());
+    //bullet1.circle.propertyFields.radius = "value";
+    bullet1.circle.fill = am4core.color("#000");
+    bullet1.circle.strokeWidth = 0;
+    bullet1.circle.fillOpacity = 0.7;
+    bullet1.interactionsEnabled = false;
+    var bullet2 = series.bullets.push(new am4charts.LabelBullet());
+    bullet2.label.text = "{value}";
+    bullet2.label.fill = am4core.color("#fff");
+    bullet2.zIndex = 1;
+    bullet2.fontSize = 11;
+    bullet2.interactionsEnabled = false;
+    // define colors
+    var colors = {
+      "critical": "#ca0101",
+      "bad": "#e17a2d",
+      "medium": "#e1d92d",
+      "good": "#5dbe24",
+      "verygood": "#0b7d03"
+    };
+    // 1,5
+    chart.data = [{
+    "y": "Casi Cierto (Almost Certain",
+    "x": "Insignificante (Insignificant)",
+    "color": colors.medium,
+    "value": {{=ArregloMapa1[1,5]}}
+    }, {
+    // 1,4
+    "y": "Muy Probable (Likely)",
+    "x": "Insignificante (Insignificant)",
+    "color": colors.good,
+    "value": {{=ArregloMapa1[1,4]}}
+    }, {
+    // 1,3
+    "y": "Factible (Possible)",
+    "x": "Insignificante (Insignificant)",
+    "color": colors.verygood,
+    "value": {{=ArregloMapa1[1,3]}}
+    }, {
+    // 1,2
+    "y": "Poco Probable (Unlikely",
+    "x": "Insignificante (Insignificant)",
+    "color": colors.verygood,
+    "value": {{=ArregloMapa1[1,2]}}
+    }, {
+    // 1,1
+    "y": "Remoto (Rare)",
+    "x": "Insignificante (Insignificant)",
+    "color": colors.verygood,
+    "value": {{=ArregloMapa1[1,1]}}
+    },
+    {
+    // 2,5
+    "y": "Casi Cierto (Almost Certain",
+    "x": "Menor (Minor)",
+    "color": colors.bad,
+    "value": {{=ArregloMapa1[2,5]}}
+    }, {
+    // 2,4
+    "y": "Muy Probable (Likely)",
+    "x": "Menor (Minor)",
+    "color": colors.medium,
+    "value": {{=ArregloMapa1[2,4]}}
+    }, {
+    // 2,3
+    "y": "Factible (Possible)",
+    "x": "Menor (Minor)",
+    "color": colors.good,
+    "value": {{=ArregloMapa1[2,3]}}
+    }, {
+    // 2,2
+    "y": "Poco Probable (Unlikely",
+    "x": "Menor (Minor)",
+    "color": colors.verygood,
+    "value": {{=ArregloMapa1[2,2]}}
+    }, {
+    // 2,1
+    "y": "Remoto (Rare)",
+    "x": "Menor (Minor)",
+    "color": colors.verygood,
+    "value": {{=ArregloMapa1[2,1]}}
+    },
+    {
+    // 3,5
+    "y": "Casi Cierto (Almost Certain",
+    "x": "Moderado (Moderate)",
+    "color": colors.bad,
+    "value": {{=ArregloMapa1[3,5]}}
+    }, {
+    // 3,4
+    "y": "Muy Probable (Likely)",
+    "x": "Moderado (Moderate)",
+    "color": colors.bad,
+    "value": {{=ArregloMapa1[3,4]}}
+    }, {
+    // 3,3
+    "y": "Factible (Possible)",
+    "x": "Moderado (Moderate)",
+    "color": colors.medium,
+    "value": {{=ArregloMapa1[3,3]}}
+    }, {
+    // 3,2
+    "y": "Poco Probable (Unlikely",
+    "x": "Moderado (Moderate)",
+    "color": colors.good,
+    "value": {{=ArregloMapa1[3,2]}}
+    }, {
+    // 3,1
+    "y": "Remoto (Rare)",
+    "x": "Moderado (Moderate)",
+    "color": colors.good,
+    "value": {{=ArregloMapa1[3,1]}}
+    },{
+    // 4,5
+    "y": "Casi Cierto (Almost Certain",
+    "x": "Mayor (Major)",
+    "color": colors.critical,
+    "value": {{=ArregloMapa1[4,5]}}
+    }, {
+    // 4,4
+    "y": "Muy Probable (Likely)",
+    "x": "Mayor (Major)",
+    "color": colors.critical,
+    "value": {{=ArregloMapa1[4,4]}}
+    }, {
+    // 4,3
+    "y": "Factible (Possible)",
+    "x": "Mayor (Major)",
+    "color": colors.bad,
+    "value": {{=ArregloMapa1[4,3]}}
+    }, {
+    // 4,2
+    "y": "Poco Probable (Unlikely",
+    "x": "Mayor (Major)",
+    "color": colors.medium,
+    "value": {{=ArregloMapa1[4,2]}}
+    }, {
+    // 4,1
+    "y": "Remoto (Rare)",
+    "x": "Mayor (Major)",
+    "color": colors.good,
+    "value": {{=ArregloMapa1[4,1]}}
+    }, {
+    // 5,5
+    "y": "Casi Cierto (Almost Certain",
+    "x": "Catastrofico (Catastrophic)",
+    "color": colors.critical,
+    "value": {{=ArregloMapa1[5,5]}}
+    }, {
+    // 5,4
+    "y": "Muy Probable (Likely)",
+    "x": "Catastrofico (Catastrophic)",
+    "color": colors.critical,
+    "value": {{=ArregloMapa1[5,4]}}
+    }, {
+    // 5,3
+    "y": "Factible (Possible)",
+    "x": "Catastrofico (Catastrophic)",
+    "color": colors.critical,
+    "value": {{=ArregloMapa1[5,3]}}
+    }, {
+    // 5,2
+    "y": "Poco Probable (Unlikely",
+    "x": "Catastrofico (Catastrophic)",
+    "color": colors.bad,
+    "value": {{=ArregloMapa1[5,2]}}
+    }, {
+    // 5,1
+    "y": "Remoto (Rare)",
+    "x": "Catastrofico (Catastrophic)",
+    "color": colors.medium,
+    "value": {{=ArregloMapa1[5,1]}}
+    }
+  ];
+  var baseWidth = Math.min(chart.plotContainer.maxWidth, chart.plotContainer.maxHeight);
+  var maxRadius = baseWidth / Math.sqrt(chart.data.length) / 2 - 2; // 2 is jast a margin
+  series.heatRules.push({ min: 10, max: maxRadius, property: "radius", target: bullet1.circle });
+  chart.plotContainer.events.on("maxsizechanged", function() {
+  var side = Math.min(chart.plotContainer.maxWidth, chart.plotContainer.maxHeight);
+    bullet1.circle.clones.each(function(clone) {
+      clone.scale = side / baseWidth;
+    })
+  })
+}); // end am4core.ready()
+
+</script>
+<!-- HTML -->
+<div id="chartdiv"></div>

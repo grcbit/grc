@@ -1,0 +1,8 @@
+/databases
+/cron
+/private
+progress.log
+routes*
+/uploads
+/sessions
+/errors

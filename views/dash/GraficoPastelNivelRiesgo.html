@@ -1,0 +1,37 @@
+<canvas id="myChart" width="90%" height="80%" ></canvas>
+<!-- <canvas id="myChart"></canvas> -->
+
+<script>
+  var ctx = document.getElementById("myChart").getContext('2d');
+  var myChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      //labels: ["Bajo (Low)", "Moderado (Moderate)", "Alto (High)", "Critico (Critical)"],
+      labels: [
+        {{for i in MatrizRiesgoClasificacion:}}
+          "{{=i.AnalisisRiesgo.NivelRiesgo}}",
+	{{pass}}
+      ],
+      datasets: [{
+        backgroundColor: [
+          "#FFC300",
+          "#00FF00",
+          "#FF0000",
+          "#FFFF00",
+        ],
+      //data: [19, 3, 17, 28,]
+      data: [
+        {{if grafico==1:}}
+          {{for i in MatrizRiesgoClasificacion:}}
+            {{=i._extra['COUNT(AnalisisRiesgo.id)']}},
+          {{pass}}
+        {{elif grafico==0:}}
+          {{for i in MatrizRiesgoClasificacion:}}
+            {{=i._extra['COUNT("AnalisisRiesgo"."id")']}},
+          {{pass}}
+        {{pass}}
+      ]
+      }]
+    }
+  });
+</script>

@@ -1,0 +1,751 @@
+#Tablero Riesgo
+
+@auth.requires_login()
+@auth.requires(auth.has_membership(role='riskManager') or auth.has_membership(role='auditManager') or auth.has_membership(role='riskAnalyst') or auth.has_membership(role='auditAnalyst') or auth.has_membership(role='processOwner') or auth.has_membership(role='controlResp') or auth.has_membership(role='admin') or auth.has_membership(role='guest'))
+def TableroRiesgo():
+    #---------------------------
+    #Queries ANALISIS RIESGO
+    #---------------------------
+    queryAnalisisRiesgo = (db.AnalisisRiesgo.AprobacionJefeRiesgo=='T')
+    #Relaciones para tablas transitivas
+    queryAnalisisRiesgoClasificacionRiesgo = (db.AnalisisRiesgoClasificacionRiesgo.AnalisisRiesgoId==db.AnalisisRiesgo.id) & (db.AnalisisRiesgoClasificacionRiesgo.ClasificacionRiesgoId==db.ClasificacionRiesgo.id) & (db.AnalisisRiesgoClasificacionRiesgo.AprobacionJefeRiesgo=='T')
+    queryAnalisisRiesgoObjetivoOrganizacion = (db.AnalisisRiesgoObjetivoOrganizacion.AnalisisRiesgoId==db.AnalisisRiesgo.id) & (db.AnalisisRiesgoObjetivoOrganizacion.ObjetivoOrganizacionId==db.ObjetivoOrganizacion.id) & (db.AnalisisRiesgoObjetivoOrganizacion.AprobacionJefeRiesgo=='T')
+    queryTratamientoRiesgoAnalisisRiesgo = (db.TratamientoRiesgoAnalisisRiesgo.TratamientoRiesgoId==db.TratamientoRiesgo.id) & (db.TratamientoRiesgoAnalisisRiesgo.AnalisisRiesgoId==db.AnalisisRiesgo.id) & (db.TratamientoRiesgoAnalisisRiesgo.AprobacionJefeRiesgo=='T')
+    queryTotalAnalisisRiesgo = queryAnalisisRiesgo & queryAnalisisRiesgoClasificacionRiesgo & queryAnalisisRiesgoObjetivoOrganizacion & queryTratamientoRiesgoAnalisisRiesgo
+    #---------------------------
+    #Queries FACTOR DE RIESGO 
+    #---------------------------
+    queryTratamientoRiesgo = (db.TratamientoRiesgo.ProcesoId==db.Proceso.id) & (db.TratamientoRiesgo.ActivoTiId==db.ActivoTi.id) & (db.TratamientoRiesgo.TipoVulnerabilidadId==db.TipoVulnerabilidad.id) & (db.TratamientoRiesgo.CriterioImpactoId==db.CriterioRiesgo.CriterioImpactoId) & (db.TratamientoRiesgo.CriterioProbabilidadId==db.CriterioRiesgo.CriterioProbabilidadId) & (db.TratamientoRiesgo.TipoTratamientoRiesgoId==db.TipoTratamientoRiesgo.id) & (db.TratamientoRiesgo.CatalogoControlId==db.CatalogoControl.id) & (db.TratamientoRiesgo.TipoControlId==db.TipoControl.id) & (db.TratamientoRiesgo.ClasificacionControlId==db.ClasificacionControl.id) & (db.TratamientoRiesgo.AprobacionJefeRiesgo=='T')
+    #Relaciones para tablas transitivas
+    queryProcesoRegion = (db.ProcesoRegion.ProcesoId==db.Proceso.id) & (db.ProcesoRegion.RegionId==db.Region.id) & (db.ProcesoRegion.AprobacionJefeRiesgo=='T')
+    queryProcesoActivoInformacion = (db.ProcesoActivoInformacion.ProcesoId==db.Proceso.id) & (db.ProcesoActivoInformacion.ActivoInformacionId==db.ActivoInformacion.id) & (db.ProcesoActivoInformacion.AprobacionJefeRiesgo=='T')
+    queryActivoTi = (db.ActivoTi.TipoCapaSistemaId==db.TipoCapaSistema.id) & (db.ActivoTi.AprobacionJefeRiesgo=='T')
+    queryActivoTiRegion = (db.ActivoTiRegion.ActivoTiId==db.ActivoTi.id) & (db.ActivoTiRegion.RegionId==db.Region.id) & (db.ActivoTiRegion.AprobacionJefeRiesgo=='T')
+    queryActivoTiProceso = (db.ActivoTiProceso.ActivoTiId==db.ActivoTi.id) & (db.ActivoTiProceso.ProcesoId==db.Proceso.id) & (db.ActivoTiProceso.AprobacionJefeRiesgo=='T')
+    queryActivoTiActivoInformacion = (db.ActivoTiActivoInformacion.ActivoTiId==db.ActivoTi.id) & (db.ActivoTiActivoInformacion.ActivoInformacionId==db.ActivoInformacion.id) & (db.ActivoTiActivoInformacion.AprobacionJefeRiesgo=='T')
+    queryTotalTratamientoRiesgo = queryTratamientoRiesgo & queryActivoTi & queryProcesoRegion & queryProcesoActivoInformacion & queryActivoTiRegion & queryActivoTiProceso & queryActivoTiActivoInformacion
+    #----------------------------
+    #Queries EVALUACION CONTROL
+    #----------------------------
+    queryEvaluacionControl = (db.EvaluacionControl.TratamientoRiesgoId==db.TratamientoRiesgo.id) & (db.EvaluacionControl.CatalogoControlId==db.CatalogoControl.id) & (db.EvaluacionControl.DetallePoliticaId==db.DetallePolitica.id) & (db.EvaluacionControl.ProcesoId==db.Proceso.id) & (db.EvaluacionControl.ActivoTiId==db.ActivoTi.id) & (db.EvaluacionControl.NivelMadurezId==db.NivelMadurez.id) & (db.EvaluacionControl.TipoRevisionId==db.TipoRevision.id) & (db.EvaluacionControl.AprobacionJefeAuditoria=='T')
+    #------------------------------
+    #Queries menu PARAMETROS HTTP
+    #------------------------------
+    Parametro = {}
+    Parametro.update(dict(request.vars))
+    #Riesgo
+    if request.vars.Riesgo:
+        Parametro['Riesgo'] = request.vars.Riesgo
+        queryAnalisisRiesgo = queryAnalisisRiesgo & (db.AnalisisRiesgo.id==request.vars.Riesgo)
+        #queryTratamientoRiesgo = queryTratamientoRiesgo & queryTipoVulnerabilidadAnalisisRiesgo & (db.TipoVulnerabilidadAnalisisRiesgo.AnalisisRiesgoId==request.vars.Riesgo)
+        queryTratamientoRiesgo = queryTratamientoRiesgo & queryTratamientoRiesgoAnalisisRiesgo & (db.TratamientoRiesgoAnalisisRiesgo.AnalisisRiesgoId==request.vars.Riesgo)
+        #queryEvaluacionControl = queryEvaluacionControl & queryTratamientoRiesgo & queryTipoVulnerabilidadAnalisisRiesgo & (db.TipoVulnerabilidadAnalisisRiesgo.AnalisisRiesgoId==request.vars.Riesgo)
+    #ObjetivoOrganizacion
+    if request.vars.Objetivo:
+        Parametro['Objetivo'] = request.vars.Objetivo
+        #queryAnalisisRiesgo = queryAnalisisRiesgo & queryAnalisisRiesgoObjetivoOrganizacion & (db.ObjetivoOrganizacion.id==request.vars.Objetivo)
+        queryAnalisisRiesgo = queryAnalisisRiesgo & queryAnalisisRiesgoObjetivoOrganizacion & (db.AnalisisRiesgoObjetivoOrganizacion.ObjetivoOrganizacionId==request.vars.Objetivo)
+        queryTratamientoRiesgo = queryTratamientoRiesgo & queryTratamientoRiesgoAnalisisRiesgo & queryAnalisisRiesgo & queryAnalisisRiesgoObjetivoOrganizacion & (db.AnalisisRiesgoObjetivoOrganizacion.ObjetivoOrganizacionId==request.vars.Objetivo)
+        #queryEvaluacionControl = queryEvaluacionControl & queryTratamientoRiesgo & queryTipoVulnerabilidadAnalisisRiesgo & queryAnalisisRiesgo & queryAnalisisRiesgoObjetivoOrganizacion & (db.ObjetivoOrganizacion.id==request.vars.Objetivo)
+    #ClasificacionRiesgo
+    if request.vars.Tipo:
+        Parametro['Tipo'] = request.vars.Tipo
+        #queryAnalisisRiesgo = queryAnalisisRiesgo & queryAnalisisRiesgoClasificacionRiesgo & (db.ClasificacionRiesgo.id==request.vars.Tipo)
+        queryAnalisisRiesgo = queryAnalisisRiesgo & queryAnalisisRiesgoClasificacionRiesgo & (db.AnalisisRiesgoClasificacionRiesgo.ClasificacionRiesgoId==request.vars.Tipo)
+        queryTratamientoRiesgo = queryTratamientoRiesgo & queryTratamientoRiesgoAnalisisRiesgo & queryAnalisisRiesgo & queryAnalisisRiesgoClasificacionRiesgo & (db.AnalisisRiesgoClasificacionRiesgo.ClasificacionRiesgoId==request.vars.Tipo)
+        #queryEvaluacionControl = queryEvaluacionControl & queryTratamientoRiesgo & queryTipoVulnerabilidadAnalisisRiesgo & queryAnalisisRiesgo & queryAnalisisRiesgoClasificacionRiesgo & (db.AnalisisRiesgoClasificacionRiesgo.ClasificacionRiesgoId==request.vars.Tipo)
+    #GrupoFactorRiesgo
+    if request.vars.Factor:
+        Parametro['Factor'] = request.vars.Factor
+        #queryAnalisisRiesgo = queryAnalisisRiesgo & queryTipoVulnerabilidadAnalisisRiesgo & (db.TipoVulnerabilidadAnalisisRiesgo.TipoVulnerabilidadId==request.vars.Factor)
+        queryAnalisisRiesgo = queryAnalisisRiesgo & queryTratamientoRiesgoAnalisisRiesgo & queryTratamientoRiesgo & (db.TratamientoRiesgo.TipoVulnerabilidadId==request.vars.Factor)
+        queryTratamientoRiesgo = queryTratamientoRiesgo & (db.TratamientoRiesgo.TipoVulnerabilidadId==request.vars.Factor)
+        #queryEvaluacionControl = queryEvaluacionControl & queryTratamientoRiesgo & (db.TratamientoRiesgo.TipoVulnerabilidadId==request.vars.Factor)
+    #GrupoControl
+    if request.vars.Control:
+        Parametro['Control'] = request.vars.Control
+        #queryAnalisisRiesgo = queryAnalisisRiesgo & (db.AnalisisRiesgo.id==db.TratamientoRiesgo.AnalisisRiesgoId) & (db.TratamientoRiesgo.CatalogoControlId==request.vars.Control)
+        queryAnalisisRiesgo = queryAnalisisRiesgo & queryTratamientoRiesgoAnalisisRiesgo & queryTratamientoRiesgo & (db.TratamientoRiesgo.CatalogoControlId==request.vars.Control)
+        queryTratamientoRiesgo = queryTratamientoRiesgo & (db.TratamientoRiesgo.CatalogoControlId==request.vars.Control)
+        #queryEvaluacionControl = queryEvaluacionControl & queryTratamientoRiesgo & (db.TratamientoRiesgo.CatalogoControlId==request.vars.Control) 
+    #----------------------
+    #Configuracion FORM
+    #----------------------
+    if auth.has_membership(role='riskManager') or auth.has_membership(role='auditManager') or auth.has_membership(role='riskAnalyst') or auth.has_membership(role='auditAnalyst') or auth.has_membership(role='admin') or auth.has_membership(role='guest'):
+        queryAnalisisRiesgo = queryAnalisisRiesgo
+        queryTratamientoRiesgo = queryTratamientoRiesgo
+        queryEvaluacionControl = queryEvaluacionControl
+    elif auth.has_membership(role='processOwner'):
+        riesgoId=[]
+        for a in db( query ).select(db.AnalisisRiesgo.id, db.AnalisisRiesgo.DuenoProceso, cacheable=True):
+            try:
+                for b in str(str(a.DuenoProceso).replace(' ','')).split(','):
+                    if b==auth.user.username:
+                        riesgoId.append(int(a.id))
+            except:
+                pass
+        queryAnalisisRiesgo = queryAnalisisRiesgo & db.AnalisisRiesgo.id.belongs(riesgoId)
+        queryTratamientoRiesgo = queryTratamientoRiesgo
+        queryEvaluacionControl = queryEvaluacionControl
+    elif auth.has_membership(role='controlResp'):
+        controlId=[]
+        for a in db( query ).select(db.TratamientoRiesgo.id, db.TratamientoRiesgo.ResponsableControl):
+            try:
+                for b in str(str(a.ResponsableControl).replace(' ','')).split(','):
+                    if b==auth.user.username:
+                        controlId.append(int(a.id))
+            except:
+                pass
+        queryAnalisisRiesgo = queryAnalisisRiesgo
+        queryTratamientoRiesgo = queryTratamientoRiesgo & db.TratamientoRiesgo.id.belongs(controlId)
+        queryEvaluacionControl = queryEvaluacionControl
+    #------------------------
+    #4 botones principales
+    #------------------------
+    #TotalRiesgoInherente = db(queryAnalisisRiesgo).count()
+    count = db.AnalisisRiesgo.id.count()
+    #------------------------------------------------------------
+    #Se hace de esta manera por que solo se muestran los riesgos
+    #que tengan asociada su clasificacion, y el objetivo afectado
+    #------------------------------------------------------------
+    group = db(queryAnalisisRiesgo & queryAnalisisRiesgoClasificacionRiesgo & queryAnalisisRiesgoObjetivoOrganizacion).select(db.AnalisisRiesgo.id, groupby=db.AnalisisRiesgo.id)
+    TotalRiesgoInherente = 0 
+    for i in group:
+        TotalRiesgoInherente = TotalRiesgoInherente + 1
+
+    #-------------------------------------------------------------------
+    #Se consideran otras relaciones con Analisis Riesgo para tomar 
+    #solo aquellos factores que estan relacionados con AnalisisRiesgo
+    #-------------------------------------------------------------------
+    #queryTratamientoRiesgo = queryTotalTratamientoRiesgo & queryTratamientoRiesgoAnalisisRiesgo & queryAnalisisRiesgo & queryAnalisisRiesgoObjetivoOrganizacion & queryAnalisisRiesgoClasificacionRiesgo
+    #queryTratamientoRiesgo = queryTratamientoRiesgo & queryTratamientoRiesgoAnalisisRiesgo
+    #group = db(queryTratamientoRiesgo & queryTratamientoRiesgoAnalisisRiesgo).select(db.TratamientoRiesgo.id, groupby=db.TratamientoRiesgo.id)
+    #TotalTratamientoRiesgo = 0
+    #for i in group:
+    #    TotalTratamientoRiesgo = TotalTratamientoRiesgo + 1
+    TotalTratamientoRiesgo = db(queryTratamientoRiesgo).count()
+    #-------------------------
+    #Mapa Calor Factor Riesgo
+    #Pastel Factor Riesgo
+    #-------------------------
+    #MatrizControlMapa = db( queryTratamientoRiesgo & queryTratamientoRiesgoAnalisisRiesgo ).select(db.TratamientoRiesgo.ALL, groupby=db.TratamientoRiesgo.id) 
+    MatrizControlMapa = db( queryTratamientoRiesgo ).select(db.TratamientoRiesgo.ALL, groupby=db.TratamientoRiesgo.id) 
+    FactorImpactoPorProbabilidad={}
+    FactorImpactoPorProbabilidadResidual={}
+    for Impacto in range(0,6):
+        for Probabilidad in range(0, 6):
+            FactorImpactoPorProbabilidad[Impacto, Probabilidad] = 0
+            FactorImpactoPorProbabilidadResidual[Impacto, Probabilidad] = 0
+    for r in MatrizControlMapa:
+        FactorImpactoPorProbabilidad[r.CriterioImpactoId.Valor, r.CriterioProbabilidadId.Valor]=FactorImpactoPorProbabilidad[r.CriterioImpactoId.Valor, r.CriterioProbabilidadId.Valor]+1
+    FactorRiesgoInherenteBajo=    FactorImpactoPorProbabilidad[1,1]+FactorImpactoPorProbabilidad[1,2]+FactorImpactoPorProbabilidad[1,3]+FactorImpactoPorProbabilidad[2,1]+FactorImpactoPorProbabilidad[2,2]
+    FactorRiesgoInherenteModerado=FactorImpactoPorProbabilidad[1,4]+FactorImpactoPorProbabilidad[2,3]+FactorImpactoPorProbabilidad[3,1]+FactorImpactoPorProbabilidad[3,2]
+    FactorRiesgoInherenteAlto =   FactorImpactoPorProbabilidad[1,5]+FactorImpactoPorProbabilidad[2,4]+FactorImpactoPorProbabilidad[2,5]+FactorImpactoPorProbabilidad[3,3]+FactorImpactoPorProbabilidad[3,4]+FactorImpactoPorProbabilidad[4,1]+FactorImpactoPorProbabilidad[4,2]+FactorImpactoPorProbabilidad[5,1]
+    FactorRiesgoInherenteCritico= FactorImpactoPorProbabilidad[3,5]+FactorImpactoPorProbabilidad[4,3]+FactorImpactoPorProbabilidad[4,4]+FactorImpactoPorProbabilidad[4,5]+FactorImpactoPorProbabilidad[5,2]+FactorImpactoPorProbabilidad[5,3]+FactorImpactoPorProbabilidad[5,4]+FactorImpactoPorProbabilidad[5,5]
+    #----------------------------------
+    #Pastel Tratamiento Factor Riesgo
+    #----------------------------------
+    TotalTratamientoRiesgo2 = db.TratamientoRiesgo.id.count()
+    #FactorTipoTratamientoRiesgo = db(queryTratamientoRiesgo & (db.TratamientoRiesgoAnalisisRiesgo.TratamientoRiesgoId==db.TratamientoRiesgo.id) & (db.TratamientoRiesgoAnalisisRiesgo.AprobacionJefeRiesgo=='T')).select(db.TratamientoRiesgo.id, db.TipoTratamientoRiesgo.Nombre, db.TipoTratamientoRiesgo.Color, TotalTratamientoRiesgo2, groupby=db.TratamientoRiesgoAnalisisRiesgo.TratamientoRiesgoId)
+    FactorTipoTratamientoRiesgo = db(queryTratamientoRiesgo).select(db.TipoTratamientoRiesgo.Nombre, db.TipoTratamientoRiesgo.Color, TotalTratamientoRiesgo2, groupby=db.TipoTratamientoRiesgo.id)
+    #FactorTipoTratamientoRiesgo = db(queryTratamientoRiesgo).select(db.TratamientoRiesgo.TipoTratamientoRiesgoId, TotalTratamientoRiesgo2, groupby=db.TratamientoRiesgo.TipoTratamientoRiesgoId)
+    #for i in group:
+    #    for x in FactorTipoTratamientoRiesgo:
+    #        if i.id == x.TratamientoRiesgo.id:
+    #            FactorTipoTratamientoRiesgo1.append(x.TratamientoRiesgo.id)
+
+    #----------------------------
+    #Pastel Clasificacion Control
+    #----------------------------
+    TotalClasificacion = []
+    TipoClasificacionControl = db(queryTratamientoRiesgo).select(db.ClasificacionControl.id, db.ClasificacionControl.Nombre, db.ClasificacionControl.Color)
+    for i in TipoClasificacionControl:
+        IndividualClasificacion = []
+        IndividualClasificacion.append(i.id)
+        IndividualClasificacion.append(i.Nombre)
+        IndividualClasificacion.append(0)
+        IndividualClasificacion.append(i.Color)
+        TotalClasificacion.append(IndividualClasificacion)
+    ClasificacionControl = db(queryTratamientoRiesgo).select(db.TratamientoRiesgo.ClasificacionControlId)
+    for i in TotalClasificacion:
+        for a in ClasificacionControl:
+            if i[0]==a.ClasificacionControlId:
+                i[2]=i[2]+1
+    #------------------------------
+    #Pastel Implementacion Control
+    #------------------------------
+    FactorStatusControl = db(queryTratamientoRiesgo).select(db.TratamientoRiesgo.StatusImplementacionControl, TotalTratamientoRiesgo2, groupby=db.TratamientoRiesgo.StatusImplementacionControl)
+    #------------------------------
+    #Medicion Factor Riesgo Fraude
+    #------------------------------
+    TotalRiesgoFraude = db( (queryTratamientoRiesgo) & (db.TratamientoRiesgo.RiesgoFraude=='T') ).count()
+    #-----------------------------------
+    #Factores de Riesgos por Sistema TI
+    #-----------------------------------
+    #GrupoActivoTiControl = db(queryTratamientoRiesgo & queryActivoTiRegion & (db.ActivoTi.Nombre!="N/A" or db.ActivoTi.Nombre!="NA")).select(db.TratamientoRiesgo.ActivoTiId, TotalTratamientoRiesgo2, groupby=db.TratamientoRiesgo.ActivoTiId)
+    GrupoActivoTiControl = db(queryTratamientoRiesgo).select(db.TratamientoRiesgo.ActivoTiId, TotalTratamientoRiesgo2, groupby=db.TratamientoRiesgo.ActivoTiId)
+    #-------------------------
+    #Tipo/Grupo Factor Riesgo
+    #-------------------------
+    GrupoTipoVulnerabilidad = db(queryTratamientoRiesgo).select(db.TratamientoRiesgo.TipoVulnerabilidadId, TotalTratamientoRiesgo2, groupby=db.TratamientoRiesgo.TipoVulnerabilidadId)
+    #-------------------------
+    #Tipo/Grupo Control
+    #-------------------------
+    GrupoControl = db(queryTratamientoRiesgo).select(db.TratamientoRiesgo.CatalogoControlId, TotalTratamientoRiesgo2, groupby=db.TratamientoRiesgo.CatalogoControlId)
+    #--------------------------
+    #Factor Riesgo por Proceso
+    #--------------------------
+    #GrupoProcesoControl = db(queryTratamientoRiesgo & queryProcesoRegion & (db.Proceso.Nombre!="N/A" or db.Proceso.Nombre!="NA") ).select(db.TratamientoRiesgo.ProcesoId, TotalTratamientoRiesgo2, groupby=db.TratamientoRiesgo.ProcesoId)
+    GrupoProcesoControl = db(queryTratamientoRiesgo).select(db.TratamientoRiesgo.ProcesoId, TotalTratamientoRiesgo2, groupby=db.TratamientoRiesgo.ProcesoId)
+    #--------------------
+    #Riesgo estrategico
+    #--------------------
+    TotalAnalisisRiesgo = db( queryTratamientoRiesgo).count()
+    GrupoRiesgoControl = db( queryTratamientoRiesgoAnalisisRiesgo).select(db.TratamientoRiesgoAnalisisRiesgo.ALL, TotalTratamientoRiesgo2, groupby=db.TratamientoRiesgoAnalisisRiesgo.AnalisisRiesgoId)
+    #---------------------------------
+    #Este se utiliza para ver detalle
+    #Una vez que se da clik en boton
+    #MatrizRiesgoInherenteIndicadores
+    #---------------------------------
+    MatrizRiesgoId = db(queryAnalisisRiesgo & queryAnalisisRiesgoClasificacionRiesgo & queryAnalisisRiesgoObjetivoOrganizacion).select(db.AnalisisRiesgo.id, distinct=True, groupby=db.AnalisisRiesgo.id )
+    MatrizRiesgo  =  db(queryAnalisisRiesgo & queryAnalisisRiesgoClasificacionRiesgo & queryAnalisisRiesgoObjetivoOrganizacion).select(db.AnalisisRiesgo.ALL, db.CriterioRiesgo.Nombre, db.CriterioRiesgo.RiesgoValor, db.ObjetivoOrganizacion.Nombre, db.ClasificacionRiesgo.Nombre, distinct=True )
+    #TotalMatrizRiesgo  =  db(db.AnalisisRiesgo.AprobacionJefeRiesgo=='T').count()
+    #TotalMatrizRiesgo  =  db( queryAnalisisRiesgo & queryAnalisisRiesgoClasificacionRiesgo & queryAnalisisRiesgoObjetivoOrganizacion).count()
+
+    ArregloMatrizRiesgo1 = []
+    ArregloMatrizRiesgo = []
+    riesgo = ''
+    clasificacion = ''
+    impacto = ''
+    probabilidad = ''
+    riesgoValor = ''
+    riesgoNivel = ''
+    consecuencia = ''
+    objetivo = ''
+
+    ArregloMatrizRiesgo1 = []
+    ArregloMatrizRiesgo = []
+    for i in MatrizRiesgoId:
+        ArregloMatrizRiesgo1.append(i.id)
+    for i in ArregloMatrizRiesgo1:
+        ArregloMatrizRiesgo2 = []
+        objetivo = ''
+        clasificacion = ''
+        validacion = False
+        for x in MatrizRiesgo:
+            if i == x.AnalisisRiesgo.id:
+                validacion = True
+                riesgo = x.AnalisisRiesgo.Riesgo
+                if str(x.ClasificacionRiesgo.Nombre) in str(clasificacion):
+                    clasificacion = clasificacion
+                else:
+                    clasificacion = clasificacion + ' | ' + str(x.ClasificacionRiesgo.Nombre)
+
+                pass
+                if str(x.ObjetivoOrganizacion.Nombre) in str(objetivo):
+                    objetivo = objetivo
+                else:
+                    objetivo = objetivo + ' | ' + str(x.ObjetivoOrganizacion.Nombre)
+                pass
+                impacto = x.AnalisisRiesgo.CriterioImpactoId.Nombre
+                probabilidad = x.AnalisisRiesgo.CriterioImpactoId.Nombre
+                riesgoValor = int(x.CriterioRiesgo.RiesgoValor)
+                riesgoNivel = x.CriterioRiesgo.Nombre
+                consecuencia = x.AnalisisRiesgo.RiesgoMaterializado
+        if validacion == True:
+            ArregloMatrizRiesgo2.append(riesgo)
+            ArregloMatrizRiesgo2.append(clasificacion)
+            ArregloMatrizRiesgo2.append(impacto)
+            ArregloMatrizRiesgo2.append(probabilidad)
+            ArregloMatrizRiesgo2.append(riesgoValor)
+            ArregloMatrizRiesgo2.append(riesgoNivel)
+            ArregloMatrizRiesgo2.append(consecuencia)
+            ArregloMatrizRiesgo2.append(objetivo)
+            ArregloMatrizRiesgo.append(ArregloMatrizRiesgo2)
+    #return dict(MatrizRiesgoControl=MatrizRiesgoControl)
+    #----------------------------------
+    #Factor Riesgo
+    #Tabla cuando se da clik en boton
+    #----------------------------------
+    MatrizControl =   db( queryTratamientoRiesgo & queryTratamientoRiesgoAnalisisRiesgo & queryAnalisisRiesgo & queryAnalisisRiesgoObjetivoOrganizacion & queryAnalisisRiesgoClasificacionRiesgo).select(db.TratamientoRiesgo.ALL, db.AnalisisRiesgo.ALL, db.CriterioRiesgo.ALL, db.ClasificacionRiesgo.ALL, db.ObjetivoOrganizacion.ALL)
+    MatrizControlId = db( queryTratamientoRiesgo & queryTratamientoRiesgoAnalisisRiesgo & queryAnalisisRiesgo & queryAnalisisRiesgoObjetivoOrganizacion & queryAnalisisRiesgoClasificacionRiesgo).select(db.TratamientoRiesgo.id, distinct=True, groupby=db.TratamientoRiesgo.id)
+    #TotalMatrizControl = db( queryTratamientoRiesgo ).count()
+
+    ArregloMatrizControl1 = []
+    ArregloMatrizControl = []
+    for i in MatrizControlId:
+        ArregloMatrizControl1.append(i.id)
+    for i in ArregloMatrizControl1:
+        ArregloMatrizControl2 = []
+        objetivo = ''
+        clasificacion = ''
+        riesgo = ''
+        for x in MatrizControl:
+            if i == x.TratamientoRiesgo.id:
+                factorRiesgo = x.TratamientoRiesgo.FactorRiesgo
+                #------------------------------------------------
+                #Para armar un arreglo con las diferentes 
+                #clasificaciones que se asignan al riesgo
+                #------------------------------------------------
+                if str(x.ClasificacionRiesgo.Nombre) in str(clasificacion):
+                    clasificacion = clasificacion
+                else:
+                    clasificacion = clasificacion + ' | ' + str(x.ClasificacionRiesgo.Nombre)
+                pass
+                #------------------------------------------------
+                #Para armar un arreglo con las diferentes 
+                #obejtivos que son afectados por el riesgo 
+                #------------------------------------------------
+                if str(x.ObjetivoOrganizacion.Nombre) in str(objetivo):
+                    objetivo = objetivo
+                else:
+                    objetivo = objetivo + ' | ' + str(x.ObjetivoOrganizacion.Nombre)
+                pass
+                idFactorRiesgo = x.TratamientoRiesgo.id
+                factorRiesgoImpactoNivel = x.TratamientoRiesgo.CriterioImpactoId.Valor
+                factorRiesgoImpactoNombre = x.TratamientoRiesgo.CriterioImpactoId.Nombre
+                factorRiesgoProbabilidadNivel = x.TratamientoRiesgo.CriterioProbabilidadId.Valor
+                factorRiesgoProbabilidadNombre = x.TratamientoRiesgo.CriterioProbabilidadId.Nombre
+                factorRiesgoNivel = x.CriterioRiesgo.RiesgoValor
+                factorRiesgoNombre = x.CriterioRiesgo.Nombre
+                tipoTratamientoRiesgo = x.TratamientoRiesgo.TipoTratamientoRiesgoId.Nombre
+                #procesoRegion = str(x.TratamientoRiesgo.ProcesoRegionId.RegionId.Nombre) + ' | ' + str(x.TratamientoRiesgo.ProcesoRegionId.ProcesoId.CicloNegocioId.Nombre) + ' | ' + str(x.TratamientoRiesgo.ProcesoRegionId.ProcesoId.MacroProcesoId.Nombre) + ' | ' + str(x.TratamientoRiesgo.ProcesoRegionId.ProcesoId.TipoProcesoId.Nombre) + ' | ' + str(x.TratamientoRiesgo.ProcesoRegionId.ProcesoId.Nombre)
+                procesoRegion = str(x.TratamientoRiesgo.ProcesoId.Nombre)
+                #activoTI = str(x.TratamientoRiesgo.ActivoTiId.id) + ' | ' + str(x.TratamientoRiesgo.ActivoTiId.Nombre) + ' | ' + str(x.TratamientoRiesgo.ActivoTiId.TipoCapaSistemaId.Nombre)
+                #activoTI = str(x.TratamientoRiesgo.ActivoTiRegionId.RegionId.Nombre) + ' | ' + str(x.TratamientoRiesgo.ActivoTiRegionId.ActivoTiId.Nombre) + ' | ' + str(x.TratamientoRiesgo.ActivoTiRegionId.ActivoTiId.TipoCapaSistemaId.Nombre)
+                activoTI = str(x.TratamientoRiesgo.ActivoTiId.Nombre)
+                riesgoFraude = x.TratamientoRiesgo.RiesgoFraude
+                escenarioAmenaza = x.TratamientoRiesgo.EscenarioAmenaza
+                riesgoMaterializadoCheck = x.TratamientoRiesgo.RiesgoMaterializadoCheck
+                tipoVulnerabilidad = x.TratamientoRiesgo.TipoVulnerabilidadId.Nombre
+                referencia = x.TratamientoRiesgo.Referencia
+                if x.TratamientoRiesgo.EvidenciaRiesgo:
+                    evidenciaTratamientoRiesgo = URL('default/download', str(x.TratamientoRiesgo.EvidenciaRiesgo))
+                else:
+                    evidenciaTratamientoRiesgo = ''
+                pass
+                fechaRevision = x.TratamientoRiesgo.FechaRevision
+                if str(x.AnalisisRiesgo.Riesgo) in str(riesgo):
+                    riesgo = riesgo
+                else:
+                    riesgo = riesgo + ' | ' + str(x.AnalisisRiesgo.Riesgo)
+                pass
+                if x.AnalisisRiesgo.EvidenciaRiesgo:
+                    evidenciaRiesgo = URL('default/download', str(x.AnalisisRiesgo.EvidenciaRiesgo))
+                else:
+                    evidenciaRiesgo = ''
+                pass
+                riesgoMaterializado = x.AnalisisRiesgo.RiesgoMaterializado
+                duenoProceso = x.AnalisisRiesgo.DuenoProceso
+                catalogoControl = x.TratamientoRiesgo.CatalogoControlId.Nombre
+                tipoControl = x.TratamientoRiesgo.TipoControlId.Nombre
+                clasificacionControl = x.TratamientoRiesgo.ClasificacionControlId.Nombre
+                keyControl = x.TratamientoRiesgo.KeyControl
+                objetivoControl = x.TratamientoRiesgo.ObjetivoControl
+                actividadControl = x.TratamientoRiesgo.ActividadControl
+                #nivelMadurez = x.TratamientoRiesgo.NivelMadurezId.Nombre
+                nivelMadurez = ''
+                comentariosRespCtrl = x.TratamientoRiesgo.ComentariosResponsableControl
+                if x.TratamientoRiesgo.EvidenciaControl:
+                    evidenciaControl = URL('default/download', str(x.TratamientoRiesgo.EvidenciaControl))
+                else:
+                    evidenciaControl = ''
+                fechaImplementacionControl = x.TratamientoRiesgo.FechaImplementacionControl
+                responsableCtrl = x.TratamientoRiesgo.ResponsableControl
+                #politica = str(x.TratamientoRiesgo.DetallePoliticaId.RegionPoliticaId.RegionId.Nombre) + ' | ' + str(x.TratamientoRiesgo.DetallePoliticaId.RegionPoliticaId.CatalogoPoliticaId.id) + ' | ' + str(x.TratamientoRiesgo.DetallePoliticaId.RegionPoliticaId.CatalogoPoliticaId.Nombre) + ' | ' + str(x.TratamientoRiesgo.DetallePoliticaId.Codigo) + ' | ' + str(x.TratamientoRiesgo.DetallePoliticaId.Nombre)
+                politica = ""
+                analistaRiesgo = x.AnalisisRiesgo.AnalistaRiesgo
+                cvssValor = x.TratamientoRiesgo.CuantificacionCVSS
+                cvssVector = x.TratamientoRiesgo.VectorCVSS
+                statusControl = x.TratamientoRiesgo.StatusImplementacionControl
+                riesgoImpacto = x.AnalisisRiesgo.CriterioImpactoId.Nombre
+        ArregloMatrizControl2.append(idFactorRiesgo)
+        ArregloMatrizControl2.append(factorRiesgo)
+        ArregloMatrizControl2.append(int(factorRiesgoImpactoNivel))
+        ArregloMatrizControl2.append(factorRiesgoImpactoNombre)
+        ArregloMatrizControl2.append(int(factorRiesgoProbabilidadNivel))
+        ArregloMatrizControl2.append(factorRiesgoProbabilidadNombre)
+        ArregloMatrizControl2.append(tipoTratamientoRiesgo)
+        ArregloMatrizControl2.append(procesoRegion)
+        ArregloMatrizControl2.append(activoTI)
+        ArregloMatrizControl2.append(riesgoFraude)
+        ArregloMatrizControl2.append(escenarioAmenaza)
+        ArregloMatrizControl2.append(riesgoMaterializadoCheck)
+        ArregloMatrizControl2.append(tipoVulnerabilidad)
+        ArregloMatrizControl2.append(evidenciaTratamientoRiesgo)
+        ArregloMatrizControl2.append(fechaRevision)
+        ArregloMatrizControl2.append(riesgo)
+        ArregloMatrizControl2.append(clasificacion)
+        ArregloMatrizControl2.append(objetivo)
+        ArregloMatrizControl2.append(evidenciaRiesgo)
+        ArregloMatrizControl2.append(riesgoMaterializado)
+        ArregloMatrizControl2.append(duenoProceso)
+        ArregloMatrizControl2.append(catalogoControl)
+        ArregloMatrizControl2.append(tipoControl)
+        ArregloMatrizControl2.append(clasificacionControl)
+        ArregloMatrizControl2.append(keyControl)
+        ArregloMatrizControl2.append(objetivoControl)
+        ArregloMatrizControl2.append(actividadControl)
+        ArregloMatrizControl2.append(nivelMadurez)
+        ArregloMatrizControl2.append(comentariosRespCtrl)
+        ArregloMatrizControl2.append(evidenciaControl)
+        ArregloMatrizControl2.append(fechaImplementacionControl)
+        ArregloMatrizControl2.append(responsableCtrl)
+        ArregloMatrizControl2.append(politica)
+        ArregloMatrizControl2.append(analistaRiesgo)
+        ArregloMatrizControl2.append(cvssValor)
+        ArregloMatrizControl2.append(cvssVector)
+        ArregloMatrizControl2.append(statusControl)
+        ArregloMatrizControl2.append(riesgoImpacto)
+        ArregloMatrizControl2.append(factorRiesgoNivel)
+        ArregloMatrizControl2.append(factorRiesgoNombre)
+        ArregloMatrizControl2.append(referencia)
+        ArregloMatrizControl.append(ArregloMatrizControl2)
+
+    '''
+    MatrizRiesgoMapa=db(queryAnalisisRiesgo).select(db.AnalisisRiesgo.ALL, groupby=db.AnalisisRiesgo.id )
+    ImpactoPorProbabilidad={}
+    ImpactoPorProbabilidadResidual={}
+    for Impacto in range(0,6):
+        for Probabilidad in range(0, 6):
+            ImpactoPorProbabilidad[Impacto, Probabilidad] = 0
+            ImpactoPorProbabilidadResidual[Impacto, Probabilidad] = 0
+    for r in MatrizRiesgoMapa:
+        ImpactoPorProbabilidad[r.CriterioImpactoId.Valor, r.CriterioImpactoId.Valor]=ImpactoPorProbabilidad[r.CriterioImpactoId.Valor, r.CriterioImpactoId.Valor]+1
+    RiesgoInherenteBajo=ImpactoPorProbabilidad[1,1]+ImpactoPorProbabilidad[1,2]+ImpactoPorProbabilidad[1,3]+ImpactoPorProbabilidad[2,1]+ImpactoPorProbabilidad[2,2]
+    RiesgoInherenteModerado=ImpactoPorProbabilidad[1,4]+ImpactoPorProbabilidad[2,3]+ImpactoPorProbabilidad[3,1]+ImpactoPorProbabilidad[3,2]
+    RiesgoInherenteAlto=ImpactoPorProbabilidad[1,5]+ImpactoPorProbabilidad[2,4]+ImpactoPorProbabilidad[2,5]+ImpactoPorProbabilidad[3,3]+ImpactoPorProbabilidad[3,4]+ImpactoPorProbabilidad[4,1]+ImpactoPorProbabilidad[4,2]+ImpactoPorProbabilidad[5,1]
+    RiesgoInherenteCritico=ImpactoPorProbabilidad[3,5]+ImpactoPorProbabilidad[4,3]+ImpactoPorProbabilidad[4,4]+ImpactoPorProbabilidad[4,5]+ImpactoPorProbabilidad[5,2]+ImpactoPorProbabilidad[5,3]+ImpactoPorProbabilidad[5,4]+ImpactoPorProbabilidad[5,5]
+    #TotalRiesgoInherente=RiesgoInherenteBajo+RiesgoInherenteModerado+RiesgoInherenteAlto+RiesgoInherenteCritico
+    '''
+    #-------------------------
+    #Relaciones para el menu
+    #-------------------------
+    #ClasificacionRiesgo = db(queryAnalisisRiesgo & queryAnalisisRiesgoClasificacionRiesgo).select(db.ClasificacionRiesgo.ALL, distinct=True, groupby=db.ClasificacionRiesgo.id)
+    ClasificacionRiesgo = db(queryAnalisisRiesgo & queryAnalisisRiesgoClasificacionRiesgo).select(db.ClasificacionRiesgo.ALL, distinct=True, groupby=db.ClasificacionRiesgo.id)
+    ObjetivoOrganizacion = db(queryAnalisisRiesgo & queryAnalisisRiesgoObjetivoOrganizacion).select(db.ObjetivoOrganizacion.ALL, distinct=True, groupby=db.ObjetivoOrganizacion.id)
+    #AnalisisRiesgo = db(queryAnalisisRiesgo).select(db.AnalisisRiesgo.ALL, distinct=True, groupby=db.AnalisisRiesgo.id, cache=(cache.ram, 3600), cacheable=True)
+    AnalisisRiesgo = db(queryAnalisisRiesgo).select(db.AnalisisRiesgo.ALL, distinct=True, groupby=db.AnalisisRiesgo.id)
+    TipoFactorRiesgo = db(queryTratamientoRiesgo).select(db.TipoVulnerabilidad.ALL, distinct=True, groupby=db.TipoVulnerabilidad.id)
+    CatalogoControl = db(queryTratamientoRiesgo).select(db.CatalogoControl.ALL, distinct=True, groupby=db.CatalogoControl.id)
+    #NivelRiesgo = db(queryAnalisisRiesgo & queryAnalisisRiesgoClasificacionRiesgo).select(db.CriterioRiesgo.RiesgoValor, db.CriterioRiesgo.Nombre, distinct=True, groupby=db.CriterioRiesgo.RiesgoValor | db.CriterioRiesgo.Nombre)    
+    NivelRiesgo = db(queryAnalisisRiesgo).select(db.CriterioRiesgo.RiesgoValor, db.CriterioRiesgo.Nombre, distinct=True, groupby=db.CriterioRiesgo.RiesgoValor | db.CriterioRiesgo.Nombre)    
+    #-----------------------------------------
+    #Relacion para graficos ANALISIS RIESGO
+    #-----------------------------------------
+    '''
+    #TotalRiesgoTop = db(queryAnalisisRiesgo ).count()
+    '''
+    #MatrizRiesgo  =  db(queryTotalAnalisisRiesgo).select(db.AnalisisRiesgo.ALL, db.CriterioRiesgo.Nombre, db.CriterioRiesgo.RiesgoValor, db.ObjetivoOrganizacion.Nombre, db.ClasificacionRiesgo.Nombre, distinct=True )
+    #MatrizRiesgoId = db(queryAnalisisRiesgo).select(db.AnalisisRiesgo.id, distinct=True, groupby=db.AnalisisRiesgo.id )
+    #MatrizRiesgoMapa=db(queryAnalisisRiesgo).select(db.AnalisisRiesgo.ALL, groupby=db.AnalisisRiesgo.id )
+    '''
+    #MatrizRiesgoMapa = db(queryAnalisisRiesgo & queryAnalisisRiesgoObjetivoOrganizacion & queryAnalisisRiesgoClasificacionRiesgo & queryAnalisisRiesgoCriterioRiesgo & queryTipoVulnerabilidadAnalisisRiesgo).select(db.AnalisisRiesgo.ALL)
+    #MatrizRiesgoMapa22 = db(db.AnalisisRiesgo.AprobacionJefeRiesgo=='T').select(db.AnalisisRiesgo.ALL)
+    #-------------------------------------------------------
+    #Matriz para armar el mapa de calor y el boton resumen   
+    #Este arreglo tambien se utiliza para el grafico         
+    #pastel de riesgo inherente                              
+    #-------------------------------------------------------
+    ImpactoPorProbabilidad={}
+    ImpactoPorProbabilidadResidual={}
+    for Impacto in range(0,6):
+        for Probabilidad in range(0, 6):
+            ImpactoPorProbabilidad[Impacto, Probabilidad] = 0
+            ImpactoPorProbabilidadResidual[Impacto, Probabilidad] = 0
+    for r in MatrizRiesgoMapa:
+        ImpactoPorProbabilidad[r.CriterioImpactoId.Valor, r.CriterioImpactoId.Valor]=ImpactoPorProbabilidad[r.CriterioImpactoId.Valor, r.CriterioImpactoId.Valor]+1
+    #--------------------------------------------
+    #Arreglo para armar el mapa de calor
+    #Contabilizar el numero de riesgos por nivel
+    #--------------------------------------------
+    RiesgoInherenteBajo=ImpactoPorProbabilidad[1,1]+ImpactoPorProbabilidad[1,2]+ImpactoPorProbabilidad[1,3]+ImpactoPorProbabilidad[2,1]+ImpactoPorProbabilidad[2,2]
+    RiesgoInherenteModerado=ImpactoPorProbabilidad[1,4]+ImpactoPorProbabilidad[2,3]+ImpactoPorProbabilidad[3,1]+ImpactoPorProbabilidad[3,2]
+    RiesgoInherenteAlto=ImpactoPorProbabilidad[1,5]+ImpactoPorProbabilidad[2,4]+ImpactoPorProbabilidad[2,5]+ImpactoPorProbabilidad[3,3]+ImpactoPorProbabilidad[3,4]+ImpactoPorProbabilidad[4,1]+ImpactoPorProbabilidad[4,2]+ImpactoPorProbabilidad[5,1]
+    RiesgoInherenteCritico=ImpactoPorProbabilidad[3,5]+ImpactoPorProbabilidad[4,3]+ImpactoPorProbabilidad[4,4]+ImpactoPorProbabilidad[4,5]+ImpactoPorProbabilidad[5,2]+ImpactoPorProbabilidad[5,3]+ImpactoPorProbabilidad[5,4]+ImpactoPorProbabilidad[5,5]
+    TotalRiesgoInherente=RiesgoInherenteBajo+RiesgoInherenteModerado+RiesgoInherenteAlto+RiesgoInherenteCritico
+    '''
+    #------------------------------------------------
+    #Arreglo para mostrar la tabla de riesgos 
+    #en el modulo MatrizRiesgoInherenteIndicadores
+    #------------------------------------------------
+    '''
+    ArregloMatrizRiesgo1 = []
+    ArregloMatrizRiesgo = []
+    riesgo = ''
+    clasificacion = ''
+    impacto = ''
+    probabilidad = ''
+    riesgoValor = ''
+    riesgoNivel = ''
+    consecuencia = ''
+    objetivo = ''
+
+    ArregloMatrizRiesgo1 = []
+    ArregloMatrizRiesgo = []
+    #for i in MatrizRiesgoId:
+        ArregloMatrizRiesgo1.append(i.id)
+    for i in ArregloMatrizRiesgo1:
+        ArregloMatrizRiesgo2 = []
+        objetivo = ''
+        clasificacion = ''
+        validacion = False
+        for x in MatrizRiesgo:
+            if i == x.AnalisisRiesgo.id:
+                validacion = True
+                riesgo = x.AnalisisRiesgo.Riesgo
+                if str(x.ClasificacionRiesgo.Nombre) in str(clasificacion):
+                    clasificacion = clasificacion
+                else:
+                    clasificacion = clasificacion + ' | ' + str(x.ClasificacionRiesgo.Nombre)
+                pass
+                if str(x.ObjetivoOrganizacion.Nombre) in str(objetivo):
+                    objetivo = objetivo
+                else:
+                    objetivo = objetivo + ' | ' + str(x.ObjetivoOrganizacion.Nombre)
+                pass
+                impacto = x.AnalisisRiesgo.CriterioImpactoId.Nombre
+                probabilidad = x.AnalisisRiesgo.CriterioImpactoId.Nombre
+                riesgoValor = int(x.CriterioRiesgo.RiesgoValor)
+                riesgoNivel = x.CriterioRiesgo.Nombre
+                consecuencia = x.AnalisisRiesgo.RiesgoMaterializado
+        if validacion == True:
+            ArregloMatrizRiesgo2.append(riesgo)
+            ArregloMatrizRiesgo2.append(clasificacion)
+            ArregloMatrizRiesgo2.append(impacto)
+            ArregloMatrizRiesgo2.append(probabilidad)
+            ArregloMatrizRiesgo2.append(riesgoValor)
+            ArregloMatrizRiesgo2.append(riesgoNivel)
+            ArregloMatrizRiesgo2.append(consecuencia)
+            ArregloMatrizRiesgo2.append(objetivo)
+            ArregloMatrizRiesgo.append(ArregloMatrizRiesgo2)
+    '''
+
+    TotalRiesgo = db.AnalisisRiesgo.id.count()
+    TipoTratamientoRiesgo = db(queryAnalisisRiesgo).select(db.TipoTratamientoRiesgo.Nombre, db.TipoTratamientoRiesgo.Color, TotalRiesgo, groupby=db.TipoTratamientoRiesgo.id)
+    #-------------------------------
+    #Relaciones para FACTOR RIESGO 
+    #-------------------------------
+    '''
+    #MatrizControl =   db( queryTratamientoRiesgo & queryTratamientoRiesgoAnalisisRiesgo & queryAnalisisRiesgoObjetivoOrganizacion & queryAnalisisRiesgoClasificacionRiesgo & queryAnalisisRiesgoCriterioRiesgo ).select(db.TratamientoRiesgo.ALL, db.AnalisisRiesgo.ALL, db.CriterioRiesgo.ALL, db.ClasificacionRiesgo.ALL, db.ObjetivoOrganizacion.ALL) 
+    '''
+    #TotalTratamientoRiesgo = db(queryTratamientoRiesgo).count()
+    #TotalTratamientoRiesgo = db.TratamientoRiesgo.id.count()
+    #TotalTratamientoRiesgo2 = db.TratamientoRiesgo.id.count()
+    #MatrizControl =   db( queryTratamientoRiesgo & queryTipoVulnerabilidadAnalisisRiesgo & queryAnalisisRiesgoObjetivoOrganizacion & queryAnalisisRiesgoClasificacionRiesgo & queryAnalisisRiesgoCriterioRiesgo ).select(db.TratamientoRiesgo.ALL, db.AnalisisRiesgo.ALL, db.CriterioRiesgo.ALL, db.ClasificacionRiesgo.ALL, db.ObjetivoOrganizacion.ALL)
+    ###MatrizControl =   db( queryTratamientoRiesgo & queryAnalisisRiesgoObjetivoOrganizacion ).select(db.TratamientoRiesgo.ALL, db.AnalisisRiesgo.ALL, db.CriterioRiesgo.ALL, db.ClasificacionRiesgo.ALL, db.ObjetivoOrganizacion.ALL)
+    #MatrizControlMapa = db( queryTratamientoRiesgo & queryTipoVulnerabilidadAnalisisRiesgo & queryAnalisisRiesgoObjetivoOrganizacion & queryAnalisisRiesgoClasificacionRiesgo & queryAnalisisRiesgoCriterioRiesgo ).select(db.TratamientoRiesgo.ALL, groupby=db.TratamientoRiesgo.id) 
+    #MatrizControlMapa = db( queryTratamientoRiesgo ).select(db.TratamientoRiesgo.ALL, groupby=db.TratamientoRiesgo.id) 
+    ###MatrizControlId = db( queryTratamientoRiesgo & queryAnalisisRiesgoObjetivoOrganizacion & queryAnalisisRiesgoClasificacionRiesgo ).select(db.TratamientoRiesgo.id, distinct=True, groupby=db.TratamientoRiesgo.id)
+    #MatrizControlId = db( queryTratamientoRiesgo ).select(db.TratamientoRiesgo.id, distinct=True, groupby=db.TratamientoRiesgo.id)
+    #MatrizControlId = db( ).select(db.TratamientoRiesgo.id, distinct=True, groupby=db.TratamientoRiesgo.id)
+    #-----------------------------------------------
+    #Arreglo relacionado para la vista de 
+    #Factor de Riesgo desde el boton de detalles
+    #-----------------------------------------------
+    '''
+    ArregloMatrizControl1 = []
+    ArregloMatrizControl = []
+    for i in MatrizControlId:
+        ArregloMatrizControl1.append(i.id)
+    for i in ArregloMatrizControl1:
+        ArregloMatrizControl2 = []
+        objetivo = ''
+        clasificacion = ''
+        riesgo = ''
+        for x in MatrizControl:
+            if i == x.TratamientoRiesgo.id:
+                factorRiesgo = x.TratamientoRiesgo.FactorRiesgo
+                if str(x.ClasificacionRiesgo.Nombre) in str(clasificacion):
+                    clasificacion = clasificacion
+                else:
+                    clasificacion = clasificacion + ' | ' + str(x.ClasificacionRiesgo.Nombre)
+                pass
+                if str(x.ObjetivoOrganizacion.Nombre) in str(objetivo):
+                    objetivo = objetivo
+                else:
+                    objetivo = objetivo + ' | ' + str(x.ObjetivoOrganizacion.Nombre)
+                pass
+                idFactorRiesgo = x.TratamientoRiesgo.id
+                factorRiesgoImpactoNivel = x.TratamientoRiesgo.CriterioImpactoId.Valor
+                factorRiesgoImpactoNombre = x.TratamientoRiesgo.CriterioImpactoId.Nombre
+                factorRiesgoProbabilidadNivel = x.TratamientoRiesgo.CriterioProbabilidadId.Valor
+                factorRiesgoProbabilidadNombre = x.TratamientoRiesgo.CriterioProbabilidadId.Nombre
+                tipoTratamientoRiesgo = x.TratamientoRiesgo.TipoTratamientoRiesgoId.Nombre
+                #procesoRegion = str(x.TratamientoRiesgo.ProcesoRegionId.RegionId.Nombre) + ' | ' + str(x.TratamientoRiesgo.ProcesoRegionId.ProcesoId.CicloNegocioId.Nombre) + ' | ' + str(x.TratamientoRiesgo.ProcesoRegionId.ProcesoId.MacroProcesoId.Nombre) + ' | ' + str(x.TratamientoRiesgo.ProcesoRegionId.ProcesoId.TipoProcesoId.Nombre) + ' | ' + str(x.TratamientoRiesgo.ProcesoRegionId.ProcesoId.Nombre)
+                procesoRegion = str(x.TratamientoRiesgo.ProcesoId.Nombre)
+                #activoTI = str(x.TratamientoRiesgo.ActivoTiId.id) + ' | ' + str(x.TratamientoRiesgo.ActivoTiId.Nombre) + ' | ' + str(x.TratamientoRiesgo.ActivoTiId.TipoCapaSistemaId.Nombre)
+                #activoTI = str(x.TratamientoRiesgo.ActivoTiRegionId.RegionId.Nombre) + ' | ' + str(x.TratamientoRiesgo.ActivoTiRegionId.ActivoTiId.Nombre) + ' | ' + str(x.TratamientoRiesgo.ActivoTiRegionId.ActivoTiId.TipoCapaSistemaId.Nombre)
+                activoTI = str(x.TratamientoRiesgo.ActivoTiId.Nombre)
+                riesgoFraude = x.TratamientoRiesgo.RiesgoFraude
+                escenarioAmenaza = x.TratamientoRiesgo.EscenarioAmenaza
+                riesgoMaterializadoCheck = x.TratamientoRiesgo.RiesgoMaterializadoCheck
+                tipoVulnerabilidad = x.TratamientoRiesgo.TipoVulnerabilidadId.Nombre
+                if x.TratamientoRiesgo.EvidenciaRiesgo:
+                    evidenciaTratamientoRiesgo = URL('default/download', str(x.TratamientoRiesgo.EvidenciaRiesgo))
+                else:
+                    evidenciaTratamientoRiesgo = ''
+                pass
+                fechaRevision = x.TratamientoRiesgo.FechaRevision
+                if str(x.AnalisisRiesgo.Riesgo) in str(riesgo):
+                    riesgo = riesgo
+                else:
+                    riesgo = riesgo + ' | ' + str(x.AnalisisRiesgo.Riesgo)
+                pass
+                if x.AnalisisRiesgo.EvidenciaRiesgo:
+                    evidenciaRiesgo = URL('default/download', str(x.AnalisisRiesgo.EvidenciaRiesgo))
+                else:
+                    evidenciaRiesgo = ''
+                pass
+                riesgoMaterializado = x.AnalisisRiesgo.RiesgoMaterializado
+                duenoProceso = x.AnalisisRiesgo.DuenoProceso
+                catalogoControl = x.TratamientoRiesgo.CatalogoControlId.Nombre
+                tipoControl = x.TratamientoRiesgo.TipoControlId.Nombre
+                clasificacionControl = x.TratamientoRiesgo.ClasificacionControlId.Nombre
+                keyControl = x.TratamientoRiesgo.KeyControl
+                objetivoControl = x.TratamientoRiesgo.ObjetivoControl
+                actividadControl = x.TratamientoRiesgo.ActividadControl
+                #nivelMadurez = x.TratamientoRiesgo.NivelMadurezId.Nombre
+                nivelMadurez = ''
+                comentariosRespCtrl = x.TratamientoRiesgo.ComentariosResponsableControl
+                if x.TratamientoRiesgo.EvidenciaControl: 
+                    evidenciaControl = URL('default/download', str(x.TratamientoRiesgo.EvidenciaControl))
+                else:
+                    evidenciaControl = ''
+                fechaImplementacionControl = x.TratamientoRiesgo.FechaImplementacionControl
+                responsableCtrl = x.TratamientoRiesgo.ResponsableControl
+                #politica = str(x.TratamientoRiesgo.DetallePoliticaId.RegionPoliticaId.RegionId.Nombre) + ' | ' + str(x.TratamientoRiesgo.DetallePoliticaId.RegionPoliticaId.CatalogoPoliticaId.id) + ' | ' + str(x.TratamientoRiesgo.DetallePoliticaId.RegionPoliticaId.CatalogoPoliticaId.Nombre) + ' | ' + str(x.TratamientoRiesgo.DetallePoliticaId.Codigo) + ' | ' + str(x.TratamientoRiesgo.DetallePoliticaId.Nombre)
+                politica = ""
+                analistaRiesgo = x.AnalisisRiesgo.AnalistaRiesgo
+        ArregloMatrizControl2.append(idFactorRiesgo)
+        ArregloMatrizControl2.append(factorRiesgo)
+        ArregloMatrizControl2.append(int(factorRiesgoImpactoNivel))
+        ArregloMatrizControl2.append(factorRiesgoImpactoNombre)
+        ArregloMatrizControl2.append(int(factorRiesgoProbabilidadNivel))
+        ArregloMatrizControl2.append(factorRiesgoProbabilidadNombre)
+        ArregloMatrizControl2.append(tipoTratamientoRiesgo)
+        ArregloMatrizControl2.append(procesoRegion)
+        ArregloMatrizControl2.append(activoTI)
+        ArregloMatrizControl2.append(riesgoFraude)
+        ArregloMatrizControl2.append(escenarioAmenaza)
+        ArregloMatrizControl2.append(riesgoMaterializadoCheck)
+        ArregloMatrizControl2.append(tipoVulnerabilidad)
+        ArregloMatrizControl2.append(evidenciaTratamientoRiesgo)
+        ArregloMatrizControl2.append(fechaRevision)
+        ArregloMatrizControl2.append(riesgo)
+        ArregloMatrizControl2.append(clasificacion)
+        ArregloMatrizControl2.append(objetivo)
+        ArregloMatrizControl2.append(evidenciaRiesgo)
+        ArregloMatrizControl2.append(riesgoMaterializado)
+        ArregloMatrizControl2.append(duenoProceso)
+        ArregloMatrizControl2.append(catalogoControl)
+        ArregloMatrizControl2.append(tipoControl)
+        ArregloMatrizControl2.append(clasificacionControl)
+        ArregloMatrizControl2.append(keyControl)
+        ArregloMatrizControl2.append(objetivoControl)
+        ArregloMatrizControl2.append(actividadControl)
+        ArregloMatrizControl2.append(nivelMadurez)
+        ArregloMatrizControl2.append(comentariosRespCtrl)
+        ArregloMatrizControl2.append(evidenciaControl)
+        ArregloMatrizControl2.append(fechaImplementacionControl)
+        ArregloMatrizControl2.append(responsableCtrl)
+        ArregloMatrizControl2.append(politica)
+        ArregloMatrizControl2.append(analistaRiesgo)
+        ArregloMatrizControl.append(ArregloMatrizControl2)
+
+    '''
+    #---------------------------------------------------------
+    '''
+    FactorImpactoPorProbabilidad={}
+    FactorImpactoPorProbabilidadResidual={}
+    for Impacto in range(0,6):
+        for Probabilidad in range(0, 6):
+            FactorImpactoPorProbabilidad[Impacto, Probabilidad] = 0
+            FactorImpactoPorProbabilidadResidual[Impacto, Probabilidad] = 0
+    for r in MatrizControlMapa:
+        #FactorImpactoPorProbabilidad[r.TratamientoRiesgo.CriterioImpactoId.Valor, r.TratamientoRiesgo.CriterioProbabilidadId.Valor]=FactorImpactoPorProbabilidad[r.TratamientoRiesgo.CriterioImpactoId.Valor, r.TratamientoRiesgo.CriterioProbabilidadId.Valor]+1
+        FactorImpactoPorProbabilidad[r.CriterioImpactoId.Valor, r.CriterioProbabilidadId.Valor]=FactorImpactoPorProbabilidad[r.CriterioImpactoId.Valor, r.CriterioProbabilidadId.Valor]+1
+        #FactorImpactoPorProbabilidad[1,1]=FactorImpactoPorProbabilidad[1,1]+1
+    #---------------------------------------------------------
+    FactorRiesgoInherenteBajo=    FactorImpactoPorProbabilidad[1,1]+FactorImpactoPorProbabilidad[1,2]+FactorImpactoPorProbabilidad[1,3]+FactorImpactoPorProbabilidad[2,1]+FactorImpactoPorProbabilidad[2,2]
+    FactorRiesgoInherenteModerado=FactorImpactoPorProbabilidad[1,4]+FactorImpactoPorProbabilidad[2,3]+FactorImpactoPorProbabilidad[3,1]+FactorImpactoPorProbabilidad[3,2]
+    FactorRiesgoInherenteAlto =   FactorImpactoPorProbabilidad[1,5]+FactorImpactoPorProbabilidad[2,4]+FactorImpactoPorProbabilidad[2,5]+FactorImpactoPorProbabilidad[3,3]+FactorImpactoPorProbabilidad[3,4]+FactorImpactoPorProbabilidad[4,1]+FactorImpactoPorProbabilidad[4,2]+FactorImpactoPorProbabilidad[5,1]
+    FactorRiesgoInherenteCritico= FactorImpactoPorProbabilidad[3,5]+FactorImpactoPorProbabilidad[4,3]+FactorImpactoPorProbabilidad[4,4]+FactorImpactoPorProbabilidad[4,5]+FactorImpactoPorProbabilidad[5,2]+FactorImpactoPorProbabilidad[5,3]+FactorImpactoPorProbabilidad[5,4]+FactorImpactoPorProbabilidad[5,5]
+    FactorTotalRiesgoInherente=   FactorRiesgoInherenteBajo+FactorRiesgoInherenteModerado+FactorRiesgoInherenteAlto+FactorRiesgoInherenteCritico
+    '''
+    #--------------------------------------------------
+    #FactorTipoTratamientoRiesgo = db(queryTratamientoRiesgo).select(db.TipoTratamientoRiesgo.Nombre, db.TipoTratamientoRiesgo.Color, TotalTratamientoRiesgo2, groupby=db.TipoTratamientoRiesgo.id)
+    #FactorStatusControl = db(queryTratamientoRiesgo).select(db.TratamientoRiesgo.StatusImplementacionControl, TotalTratamientoRiesgo2, groupby=db.TratamientoRiesgo.StatusImplementacionControl)
+    #TotalTratamientoRiesgo2 = db.TratamientoRiesgo.id.count()
+    #GrupoTipoVulnerabilidad = db(queryTratamientoRiesgo).select(db.TratamientoRiesgo.TipoVulnerabilidadId, TotalTratamientoRiesgo2, groupby=db.TratamientoRiesgo.TipoVulnerabilidadId)
+    #TotalRiesgoFraude = db( (queryTratamientoRiesgo) & (db.TratamientoRiesgo.RiesgoFraude=='T') ).count()
+    #TotalRiesgoFraude = db( (queryTratamientoRiesgo) & (db.TratamientoRiesgo.RiesgoFraude=='T') ).count()
+    #GrupoProcesoControl = db(queryTratamientoRiesgo & queryTratamientoRiesgoAnalisisRiesgo & (db.Proceso.Nombre!="N/A" or db.Proceso.Nombre!="NA") ).select(db.TratamientoRiesgo.ProcesoRegionId, TotalTratamientoRiesgo2, groupby=db.TratamientoRiesgo.ProcesoRegionId)
+    #GrupoProcesoControl = db(queryTratamientoRiesgo & queryProcesoRegion & (db.Proceso.Nombre!="N/A" or db.Proceso.Nombre!="NA") ).select(db.TratamientoRiesgo.ProcesoId, TotalTratamientoRiesgo2, groupby=db.TratamientoRiesgo.ProcesoId)
+    #GrupoRiesgoControl = db(queryAnalisisRiesgo & queryTratamientoRiesgoAnalisisRiesgo).select(db.AnalisisRiesgo.Riesgo, TotalTratamientoRiesgo2, groupby=db.AnalisisRiesgo.id)
+    #GrupoRiesgoControl = db(queryTratamientoRiesgo & queryTratamientoRiesgoAnalisisRiesgo).select(db.TratamientoRiesgoAnalisisRiesgo.AnalisisRiesgoId, TotalTratamientoRiesgo2, groupby=db.TratamientoRiesgoAnalisisRiesgo.AnalisisRiesgoId)
+    #GrupoRiesgoControl = db(queryTratamientoRiesgo & queryTipoVulnerabilidadAnalisisRiesgo).select(db.TipoVulnerabilidadAnalisisRiesgo.AnalisisRiesgoId, TotalTratamientoRiesgo2, groupby=db.TipoVulnerabilidadAnalisisRiesgo.AnalisisRiesgoId)
+    #TotalTipoVulnerabilidad2 = db.TratamientoRiesgo.id.count()
+    #TotalTipoVulnerabilidad2 = db.TipoVulnerabilidadAnalisisRiesgo.id.count()
+    #GrupoRiesgoControl = db(queryTipoVulnerabilidadAnalisisRiesgo).select(db.TipoVulnerabilidadAnalisisRiesgo.AnalisisRiesgoId, TotalTipoVulnerabilidad2, groupby=db.TipoVulnerabilidadAnalisisRiesgo.AnalisisRiesgoId)
+    #GrupoRiesgoControl = db(queryTipoVulnerabilidadAnalisisRiesgo & queryTratamientoRiesgo).select(db.TipoVulnerabilidadAnalisisRiesgo.AnalisisRiesgoId, TotalTipoVulnerabilidad2, groupby=db.TipoVulnerabilidadAnalisisRiesgo.AnalisisRiesgoId)
+    #GrupoRiesgoControl = db( queryTratamientoRiesgo).select(db.TipoVulnerabilidadAnalisisRiesgo.AnalisisRiesgoId, TotalTipoVulnerabilidad2, groupby=db.TipoVulnerabilidadAnalisisRiesgo.AnalisisRiesgoId)
+    #TotalAnalisisRiesgo = db(queryTipoVulnerabilidadAnalisisRiesgo & queryTratamientoRiesgo).count()
+    #TotalAnalisisRiesgo = db( queryTratamientoRiesgo).count()
+    #GrupoRiesgoControl = db(db.TipoVulnerabilidadAnalisisRiesgo).select(db.TipoVulnerabilidadAnalisisRiesgo.AnalisisRiesgoId, TotalTipoVulnerabilidad2, groupby=db.TipoVulnerabilidadAnalisisRiesgo.AnalisisRiesgoId)
+    #GrupoActivoTiControl = db(queryTratamientoRiesgo & queryActivoTiRegion & (db.ActivoTi.Nombre!="N/A" or db.ActivoTi.Nombre!="NA")).select(db.TratamientoRiesgo.ActivoTiId, TotalTratamientoRiesgo2, groupby=db.TratamientoRiesgo.ActivoTiId)
+
+
+
+    '''
+    #----------------------------------------------------------
+    TotalClasificacion = []
+    #TipoClasificacionControl = db(db.ClasificacionControl.AprobacionJefeRiesgo=='T').select(db.ClasificacionControl.id, db.ClasificacionControl.Nombre, db.ClasificacionControl.Color)
+    TipoClasificacionControl = db(queryTratamientoRiesgo).select(db.ClasificacionControl.id, db.ClasificacionControl.Nombre, db.ClasificacionControl.Color)
+    for i in TipoClasificacionControl:
+        IndividualClasificacion = []
+        IndividualClasificacion.append(i.id)
+        IndividualClasificacion.append(i.Nombre)
+        IndividualClasificacion.append(0)
+        IndividualClasificacion.append(i.Color)
+        TotalClasificacion.append(IndividualClasificacion)
+    #ClasificacionControl = db(queryTratamientoRiesgo & queryTratamientoRiesgoAnalisisRiesgo).select(db.TratamientoRiesgo.ClasificacionControlId)
+    ClasificacionControl = db(queryTratamientoRiesgo).select(db.TratamientoRiesgo.ClasificacionControlId)
+    for i in TotalClasificacion:
+        for a in ClasificacionControl:
+            if i[0]==a.ClasificacionControlId:
+                i[2]=i[2]+1
+    #----------------------------------------------------------
+    madurezt = []
+    m = db(db.NivelMadurez.AprobacionJefeRiesgo=='T').select(db.NivelMadurez.id, db.NivelMadurez.Nombre)
+    for i in m:
+        madurezi = []
+        madurezi.append(i.id)
+        madurezi.append(i.Nombre)
+        madurezi.append(0)
+        madurezt.append(madurezi)
+    #MadurezSeguridad = db(queryTratamientoRiesgo).select(db.TratamientoRiesgo.NivelMadurezId)
+    MadurezSeguridad = ''
+    for i in MadurezSeguridad:
+        for m in madurezt:
+            if m[0]==i.NivelMadurezId:
+                m[2]=m[2]+1
+    '''
+    #-------------------------------------------------------------
+    #Queries para los graficos relacionados a EvaluacionControl
+    #-------------------------------------------------------------
+    TotalEvaluacionControl = db(queryEvaluacionControl).count()
+    EfectividadControl = db((queryEvaluacionControl) & ( db.EvaluacionControl.EfectividadControl=='T' ) ).count()
+    CumplimientoControl = db((queryEvaluacionControl) & ( db.EvaluacionControl.CumplimientoControl=='T' ) & (db.EvaluacionControl.TipoRevisionId==2) ).count()
+    TotalAuditoriaCumplimiento = db( (queryEvaluacionControl) & (db.EvaluacionControl.TipoRevisionId==2)).count()
+    #-------------------------------------------------------------
+    TotalIncidenteSeguridad = db(db.IncidenteSeguridad.AprobacionJefeRiesgo=='T').count()
+    #TotalAmbienteControl = db(db.AmbienteControl.AprobacionJefeRiesgo=='T').count()
+    #AmbienteControl = db(db.AmbienteControl.AprobacionJefeRiesgo=='T').select(db.AmbienteControl.ALL)
+    #NivelMadurez = db(db.NivelMadurez.AprobacionJefeRiesgo=='T').select(db.NivelMadurez.ALL, orderby=db.NivelMadurez.Valor, distinct=True)
+    try:
+        Organizacion = db(db.Configuracion).select(db.Configuracion.Organizacion).first().Organizacion
+    except:
+        Organizacion = "XXX"
+    
+    return dict(ArregloMatrizControl=ArregloMatrizControl, GrupoControl=GrupoControl, TotalTratamientoRiesgo=TotalTratamientoRiesgo, Parametro=Parametro, TotalRiesgo=TotalRiesgo,  ClasificacionRiesgo=ClasificacionRiesgo, TipoTratamientoRiesgo=TipoTratamientoRiesgo, TotalRiesgoFraude=TotalRiesgoFraude, Organizacion=Organizacion, ActivoTiProceso=ActivoTiProceso, EfectividadControl=EfectividadControl, TotalClasificacion=TotalClasificacion, CumplimientoControl=CumplimientoControl, TotalEvaluacionControl=TotalEvaluacionControl, GrupoTipoVulnerabilidad=GrupoTipoVulnerabilidad, GrupoActivoTiControl=GrupoActivoTiControl, GrupoProcesoControl=GrupoProcesoControl, GrupoRiesgoControl=GrupoRiesgoControl, ObjetivoOrganizacion=ObjetivoOrganizacion, TotalAuditoriaCumplimiento=TotalAuditoriaCumplimiento, TotalIncidenteSeguridad=TotalIncidenteSeguridad, TotalTratamientoRiesgo2=TotalTratamientoRiesgo2, AnalisisRiesgo=AnalisisRiesgo, TipoFactorRiesgo=TipoFactorRiesgo, CatalogoControl=CatalogoControl, TotalRiesgoInherente=TotalRiesgoInherente, NivelRiesgo=NivelRiesgo, FactorRiesgoInherenteBajo=FactorRiesgoInherenteBajo, FactorRiesgoInherenteModerado=FactorRiesgoInherenteModerado, FactorRiesgoInherenteAlto=FactorRiesgoInherenteAlto, FactorRiesgoInherenteCritico=FactorRiesgoInherenteCritico, FactorImpactoPorProbabilidad=FactorImpactoPorProbabilidad, FactorTipoTratamientoRiesgo=FactorTipoTratamientoRiesgo, FactorStatusControl=FactorStatusControl, TotalAnalisisRiesgo=TotalAnalisisRiesgo, ArregloMatrizRiesgo=ArregloMatrizRiesgo)

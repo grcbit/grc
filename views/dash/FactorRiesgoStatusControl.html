@@ -1,0 +1,49 @@
+<canvas id="myChart9" width="90%" height="80%" ></canvas>
+
+<script>
+  var ctx = document.getElementById("myChart9").getContext('2d');
+  var myChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: [
+        {{for i in FactorRiesgoStatusControl:}}
+          "{{=i.TratamientoRiesgo.StatusImplementacionControl}}",
+	{{pass}}
+      ],
+      datasets: [{
+        backgroundColor: [
+	  "#C0C0C0",
+	  "#666666",
+          "#993300",
+          "#FFCCCC",
+	  "#808080",
+          "#800000",
+          "#808000",
+	  "#00FFFF",
+          "#008080",
+          "#FF00FF",
+          "#FF9966",
+          "#FF9900",
+          "#333399",
+          "#330099",
+          "#33CC66",
+          "#FFCC00",
+          "#CC9933",
+          "#999999",
+        ],
+      //data: [19, 3, 17, 28,]
+      data: [
+        {{if grafico==1:}}
+          {{for i in FactorRiesgoStatusControl:}}
+            {{=i._extra['COUNT(TratamientoRiesgo.id)']}},
+          {{pass}}
+        {{elif grafico==0:}}
+          {{for i in FactorRiesgoStatusControl:}}
+            {{=i._extra['COUNT("TratamientoRiesgo"."id")']}},
+          {{pass}}
+        {{pass}}
+      ]
+      }]
+    }
+  });
+</script>

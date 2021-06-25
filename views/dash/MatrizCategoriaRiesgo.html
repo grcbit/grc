@@ -1,0 +1,30 @@
+
+<script>
+  $(document).ready(function() {$("#MatrizRiesgoCategoria").removeAttr('width').dataTable( { lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]], scrollY: "300px", scrollX: true, scrollCollapse: true,  dom: 'Bfrtip', buttons: ['copy', 'csv', 'excel', 'pdf', 'print'] });} );
+</script>
+
+<h6>
+  <div class="row">
+    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+    <table id="MatrizRiesgoCategoria" align="left" class="display" width="90%" cellspacing="0" style="font-size:15" >
+      <thead>
+      <tr>
+        <td class="Riesgo">{{=T('RISK')}}</td>
+        <td>{{=T('CATEGORY')}}</td>
+      </tr>
+      </thead>
+    <tbody>
+    {{for i in ArregloRiesgoCategoria:}}
+      <tr>
+	<td>{{=i[0]}}</td>
+	<td>{{=i[1]}}</td>
+      </tr>
+    {{pass}}
+    </tbody>
+  </table>
+  </div>
+</div>
+<br>
+
+</h6>
+

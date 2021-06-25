@@ -1,0 +1,27 @@
+{{extend 'layout.html'}}
+{{include 'dash/LayoutGraficos.html'}}
+{{include 'dash/LayoutDatatables.html'}}
+
+<strong>{{=T('RISK OVERVIEW REPORT')}}</strong>
+<br>
+<br>
+<div class="row row-centered" style="width:90%;">
+  <div class="col-md-4 col-lg-4 col-sm-4 col-xs-4">
+    <strong>{{=T('Risk Level')}}</strong>
+    {{include 'dash/GraficoPastelNivelRiesgo.html'}}
+  </div>
+  <div class="col-md-8 col-lg-8 col-sm-8 col-xs-8">
+    {{include 'dash/MatrizNivelRiesgo.html'}}
+  </div>
+</div>
+
+<div class="row row-centered" style="width:90%;">
+  <div class="col-md-4 col-lg-4 col-sm-4 col-xs-4">
+    <strong>{{=T('Risk Category')}}</strong>
+    {{include 'dash/GraficoPastelCategoriaRiesgo.html'}}
+  </div>
+  <div class="col-md-8 col-lg-8 col-sm-8 col-xs-8">
+    {{include 'dash/MatrizCategoriaRiesgo.html'}}
+  </div>
+</div>
+

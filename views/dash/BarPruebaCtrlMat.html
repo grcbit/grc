@@ -1,0 +1,87 @@
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="../../assets/styles.css" rel="stylesheet" />
+    <style> #chart { max-width: 90%; margin: 35px auto; } </style>
+
+    <div id="app2"></div>
+
+    <script type="text/babel">
+      class ApexChart extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = {
+	    series:[
+
+	    {{for c in range(1,col):}}
+	    {
+		name: '{{=matrizA[0,c]}}',
+		data: [{{for f in range(1,fila):}} {{=matrizA[f, c]}}, {{pass}}]
+	    },
+	    {{pass}}
+
+	    ],
+            options: {
+              chart: {
+                type: 'bar',
+                height: 350,
+                stacked: true,
+              },
+              plotOptions: {
+                bar: {
+                  horizontal: true,
+                },
+              },
+              stroke: {
+                width: 1,
+                colors: ['#CCCCCC'],
+              },
+              title: {
+		text: '{{=T('Security Maturity Level')}}'
+              },
+
+              xaxis: {
+	      categories: [{{for f in range(1,fila):}} ' {{=matrizA[f,0]}} ', {{pass}}],
+                /* labels: {
+                  formatter: function (val) {
+                    return val 
+                  }
+                }*/
+              },
+              yaxis: {
+                title: {
+                  text: undefined
+                },
+              },
+              tooltip: {
+                y: {
+                  formatter: function (val) {
+                    return val
+                  }
+                }
+              },
+              fill: {
+                opacity: 1
+              },
+              legend: {
+                position: 'top',
+                horizontalAlign: 'left',
+                offsetX: 40
+              }
+            },
+          
+          
+          };
+        }
+        render() {
+          return (
+            <div>
+              <div id="chart">
+                <ReactApexChart options={this.state.options} series={this.state.series} type="bar" height={350} />
+              </div>
+            </div>
+          );
+        }
+      }
+      const domContainer = document.querySelector('#app2');
+      ReactDOM.render(React.createElement(ApexChart), domContainer);
+    </script>

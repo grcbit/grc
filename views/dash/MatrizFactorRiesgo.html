@@ -1,0 +1,135 @@
+
+<script>
+	$(document).ready(function() {$("#MatrizRiesgoControl").removeAttr('width').dataTable( { lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]], scrollY: "500px", scrollX: true, scrollCollapse: true,  columnDefs: [{targets: ['Riesgo', 'ObjetivoControl', 'ActividadControl', 'RiskFactor', 'Threat', 'RiesgoMaterializado', 'ComentariosResponsableControl', 'Politica', 'TipoFactorRiesgo', 'ObjetivoOrganizacion', 'CatalogoControl','Clasificacion' ], width:500 } ], fixedColumns: {leftColumns: 2}, dom: 'Bfrtip', buttons: ['copy', 'csv', 'excel', 'pdf', 'print']  } );} );
+</script>
+
+<h6>
+  <table id="MatrizRiesgoControl" align="left" class="display" width="100%" cellspacing="0" style="font-size:11">
+    <thead>
+      <tr>
+	<td>{{=T('RISK FACTOR')}} {{=T('ID')}}</td>                              <!--ID Factor Riesgo-->
+	<td class="RiskFactor">{{=T('RISK FACTOR')}}</td>                        <!--Factor Riesgo-->
+	<td>{{=T('RISK FACTOR')}} {{=T('IMPACT')}}</td>                          <!--Impacto-->
+	<td>{{=T('RISK FACTOR')}} {{=T('PROBABILITY')}}</td>                     <!--Probabilidad-->
+	<td>{{=T('RISK FACTOR')}} {{=T('RISK LEVEL')}}</td>                      <!--Probabilidad-->
+	<td class="Referencia">{{=T('REFERENCE')}}</td>                          <!--Referencia-->
+	<td>{{=T('SCORE CVSS')}}</td>                                            <!--Score CVSS-->
+	<td>{{=T('VECTOR CVSS')}}</td>                                           <!--Vector CVSS-->
+	<td>{{=T('RISK FACTOR')}} {{=T('TREATMENT')}}</td>                       <!--Tratamiento Factor Riesgo-->
+	<td>{{=T('PROCESS')}}</td>                                               <!--Proceso-->
+	<td>{{=T('SYSTEM')}}</td>                                                <!--Activo Ti-->
+	<td>{{=T('RISK FACTOR')}} {{=T('FRAUD')}}</td>                           <!--Riesgo Fraude-->
+	<td class="Threat">{{=T('THREAT SCENARIO')}}</td>                        <!--Escenario Amenaza-->
+	<td>{{=T('MATERIALIZED RISK')}}</td>                                     <!--Riesgo Materializado-->
+	<td class="TipoFactorRiesgo">{{=T('RISK FACTOR TYPE')}}</td>             <!--Tipo Factor Riesgo-->
+	<td>{{=T('RISK FACTOR')}} {{=T('EVIDENCE')}}</td>                        <!--Evidencia Factor Riesgo-->
+	<td>{{=T('RISK FACTOR')}} {{=T('DATE')}}</td>                            <!--Fecha Revision-->
+	<td class="Riesgo">{{=T('RISK')}}</td>                                   <!--RIESGO-->
+	<td>{{=T('RISK IMPACT')}}</td>                                           <!--IMPACTO RIESGO-->
+	<td>{{=T('RISK CLASSIFICATION')}}</td>                                   <!--ANALISIS RIESGO - CLASIFICACION RIESGO-->
+	<td class="ObjetivoOrganizacion">{{=T('ORGANISATIONAL OBJECTIVE AFFECTED')}}</td> <!--ANALISIS RIESGO - OBJETIVO ORGANIZACION-->
+	<td>{{=T('RISK EVIDENCE')}}</td>                                         <!--DOCUMENTACION RIESGO-->
+	<td class="RiesgoMaterializado">{{=T('RISK CONSEQUENCE')}}</td>          <!--CONSECUENCIA RIESGO-->
+	<td>{{=T('RISK OWNER')}}</td>                                            <!--DUENO RIESGO-->
+	<td class="CatalogoControl">{{=T('CONTROL')}}</td>                       <!--Control-->
+	<td>{{=T('CONTROL TYPE')}}</td>                                          <!--Tipo Control-->
+	<td class="Clasificacion">{{=T('CONTROL CLASSIFICATION')}}</td>          <!--Clasificacion Control-->
+	<td>{{=T('KEY CONTROL')}}</td>                                           <!--Control Clave-->
+	<td class="ObjetivoControl">{{=T('CONTROL OBJECTIVE')}}</td>             <!--Objetivo Control-->
+	<td class="ActividadControl">{{=T('CONTROL ACTIVITY')}}</td>             <!--Actividad Control-->
+	<td>{{=T('CONTROL STATUS')}}</td>                                        <!--Status Implementacion Control-->
+	<!-- 'CONTROL MATURITY LEVEL') -->                                       <!-- ########### -->
+	<td class="ComentariosResponsableControl">{{=T('COMMENTS')}}</td>        <!--Comentarios-->
+	<td>{{=T('CONTROL IMPLEMENTATION EVIDENCE')}}</td>                       <!--Evidencia Control-->
+	<td>{{=T('CONTROL IMPLEMENTATION ESTIMATED DATE')}}</td>                 <!--Fecha Estimada Implementacion Control-->
+	<td>{{=T('CONTROL RESPONSIBLE')}}</td>                                   <!--Responsable Control-->
+	<!--  class="Politica">'POLICY'> -->                                     <!-- ########### -->
+	<!-- 'RISK ANALYST') -->                                                 <!--Analista Factor Riesgo-->
+      </tr>
+    </thead>
+    <tbody>
+      {{for i in ArregloMatrizControl:}}
+        <tr>
+          <td>{{=i[0]}}</td>
+	  <td>{{=i[1]}}</td>
+          {{if i[2]==1:}}
+            <td bgcolor="#00FF00">{{=i[3]}}</td>
+          {{elif i[2]==2:}}
+            <td bgcolor="#FFFF00">{{=i[3]}}</td>
+          {{elif i[2]==3:}}
+            <td bgcolor="#FFFF00">{{=i[3]}}</td>
+          {{elif i[2]==4:}}
+            <td bgcolor="#FFC300">{{=i[3]}}</td>
+          {{elif i[2]==5:}}
+            <td bgcolor="#FF0000">{{=i[3]}}</td>
+          {{pass}}
+          {{if i[4]==1:}}
+            <td bgcolor="#00FF00">{{=i[5]}}</td>
+          {{elif i[4]==2:}}
+            <td bgcolor="#FFFF00">{{=i[5]}}</td>
+          {{elif i[4]==3:}}
+            <td bgcolor="#FFFF00">{{=i[5]}}</td>
+          {{elif i[4]==4:}}
+            <td bgcolor="#FFC300">{{=i[5]}}</td>
+          {{elif i[4]==5:}}
+            <td bgcolor="#FF0000">{{=i[5]}}</td>
+          {{pass}}
+          {{if i[38]==1:}}
+            <td bgcolor="#00FF00">{{=i[39]}}</td>
+          {{elif i[38]==3:}}
+            <td bgcolor="#FFFF00">{{=i[39]}}</td>
+          {{elif i[38]==4:}}
+            <td bgcolor="#FFC300">{{=i[39]}}</td>
+          {{elif i[38]==5:}}
+            <td bgcolor="#FF0000">{{=i[39]}}</td>
+          {{pass}}
+	  <td>{{=i[40]}}</td>
+          <td>{{=i[34]}}</td>
+          <td>{{=i[35]}}</td>
+          <td>{{=i[6]}}</td>
+          <td>{{=i[7]}}</td>
+          <td>{{=i[8]}}</td>
+          <td>{{=i[9]}}</td>
+          <td>{{=i[10]}}</td>
+          <td>{{=i[11]}}</td>
+          <td>{{=i[12]}}</td>
+      	  {{if i[13]!='':}}
+            <td><a href="{{=i[13]}}">File</a></td>
+          {{else:}}
+	    <td></td>
+	  {{pass}}
+          <td>{{=i[14]}}</td>
+          <td bgcolor="#EEEEEE">{{=i[15]}}</td>
+    	  <td bgcolor="#EEEEEE">{{=i[37]}}</td>
+    	  <td bgcolor="#EEEEEE">{{=i[16]}}</td>
+  	  <td bgcolor="#EEEEEE">{{=i[17]}}</td>
+          {{if i[18]!='':}}
+	    <td bgcolor="#EEEEEE"><a href="{{=i[18]}}">File</a></td>
+          {{else:}}
+	    <td bgcolor="#EEEEEE"></td>
+	  {{pass}}
+          <td bgcolor="#EEEEEE">{{=i[19]}}</td>
+	  <td bgcolor="#EEEEEE">{{=i[20]}}</td>
+          <td>{{=i[21]}}</td>
+          <td>{{=i[22]}}</td>
+          <td>{{=i[23]}}</td>
+          <td>{{=i[24]}}</td>
+          <td>{{=i[25]}}</td>
+          <td>{{=i[26]}}</td>
+	  <!--NIVELES MADUREZ-->
+          <td>{{=i[36]}}</td>
+          <td>{{=i[28]}}</td>
+	  {{if i[29]!='':}}
+	    <td><a href="{{=i[29]}}">File</a></td>
+          {{else:}}
+	    <td></td>
+	  {{pass}}
+          <td>{{=i[30]}}</td>
+          <td>{{=i[31]}}</td>
+	  <!-- [32] -->
+	  <!-- [33] -->
+        </tr>
+      {{pass}}
+    </tbody>
+  </table>
+</h6>
