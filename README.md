@@ -1,3 +1,10 @@
+
+THE PROJECT IS NOW BEING MAINTAINED IN THE OWASP PROJECTS REPOSITORY 
+
+https://github.com/OWASP/www-project-it-grc
+
+
+-------
 GRCbit - Governance, Risk and Compliance Software (GRC)
 Copyright (C) rodolfo.lopez@grcbit.com
 
