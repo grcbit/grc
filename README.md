@@ -3,6 +3,9 @@ THE PROJECT IS NOW BEING MAINTAINED IN THE OWASP PROJECT REPOSITORY
 
 https://github.com/OWASP/www-project-it-grc
 
+DEMO: http://dev.grcbit.cloud:8000/demo/
+User: admin@email.com
+Passwd: Password01
 
 -------
 GRCbit - Governance, Risk and Compliance Software (GRC)
